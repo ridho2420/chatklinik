@@ -1,0 +1,785 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Asisten WhatsApp otomatis khusus klinik kecantikan. Jawab chat pasien 24 jam, catat booking, dan kirim laporan harian ke owner.">
+<meta property="og:title" content="ChatKlinik: Asisten WhatsApp otomatis untuk klinik kecantikan">
+<meta property="og:description" content="Jawab chat pasien 24 jam dengan luwes. Coba simulasi demonya langsung di WhatsApp.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#1E4FB8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%231E4FB8'/%3E%3Cpath d='M18 18h28a6 6 0 0 1 6 6v12a6 6 0 0 1-6 6H31l-8 6v-6h-5a6 6 0 0 1-6-6V24a6 6 0 0 1 6-6z' fill='white'/%3E%3Cpath d='M32 22c.8 4 2 5.2 6 6-4 .8-5.2 2-6 6-.8-4-2-5.2-6-6 4-.8 5.2-2 6-6z' fill='%231E4FB8'/%3E%3C/svg%3E">
+<style>html{color-scheme:light}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>ChatKlinik</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Serif+Display&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Playfair+Display:wght@600;700&family=Lato:wght@400;700&display=swap">
+<style>
+/* Layout: hero dua kolom (pesan di kiri, HP berisi simulasi chat di kanan), lalu fitur 2x2, lalu kartu harga. */
+:root {
+  /* Palet A: Toska Klinik (default) */
+  --bg: #F5FAF9; --surface: #FFFFFF; --ink: #0E2724; --muted: #4A635F; --line: #D6E5E2;
+  --brand: #0D7A70; --brand-ink: #FFFFFF; --brand-soft: #DDF1EE;
+  --warm: #D9764E; --warm-soft: #FCE6DA;
+  --glow1: rgba(13,122,112,.20); --glow2: rgba(233,135,95,.26);
+  /* WhatsApp */
+  --wa-bg: #EFEAE2; --wa-in: #FFFFFF; --wa-out: #D9FDD3; --wa-ink: #111B21; --wa-meta: #667781;
+  --wa-head: #FFFFFF; --wa-input: #FFFFFF; --wa-tick: #53BDEB; --wa-chip: #FFF3C4; --wa-chip-ink: #54471A;
+  --frame: #12191C; --shadow: 0 30px 60px -28px rgba(14,39,36,.45);
+  --display: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --body: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --display-w: 800; --display-scale: 1; --display-track: -0.035em;
+}
+:root[data-font="dmserif"] { --display: "DM Serif Display", Georgia, serif; --body: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif; --display-w: 400; --display-scale: 1.04; --display-track: -0.01em; }
+:root[data-font="playfair"] { --display: "Playfair Display", Georgia, serif; --body: "Lato", system-ui, -apple-system, "Segoe UI", sans-serif; --display-w: 700; --display-scale: 1; --display-track: -0.015em; }
+:root[data-palette="plum"] {
+  --bg: #FBF5F8; --surface: #FFFFFF; --ink: #2A1426; --muted: #694F63; --line: #EBDCE6;
+  --brand: #7A2E6B; --brand-ink: #FFFFFF; --brand-soft: #F4E3EF;
+  --warm: #B87645; --warm-soft: #F7E8DB;
+  --glow1: rgba(122,46,107,.26); --glow2: rgba(214,150,110,.30); --shadow: 0 30px 60px -28px rgba(42,20,38,.45);
+}
+:root[data-palette="navy"] {
+  --bg: #F4F7FB; --surface: #FFFFFF; --ink: #0E1E33; --muted: #4C5E77; --line: #D9E2EE;
+  --brand: #173B6C; --brand-ink: #FFFFFF; --brand-soft: #E1EAF6;
+  --warm: #138A66; --warm-soft: #DAF3EA;
+  --glow1: rgba(23,59,108,.18); --glow2: rgba(31,163,122,.22); --shadow: 0 30px 60px -28px rgba(14,30,51,.45);
+}
+:root[data-palette="biru"] {
+  --bg: #F4F7FD; --surface: #FFFFFF; --ink: #0E1A33; --muted: #4A5A77; --line: #D9E3F2;
+  --brand: #1E4FB8; --brand-ink: #FFFFFF; --brand-soft: #E2EBFB;
+  --warm: #D9692E; --warm-soft: #FDEADD;
+  --glow1: rgba(30,79,184,.22); --glow2: rgba(56,189,248,.24); --shadow: 0 30px 60px -28px rgba(14,26,51,.45);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"])[data-palette="biru"] {
+    --bg: #09101D; --surface: #101A2C; --ink: #E7EEF9; --muted: #9DB0CC; --line: #223350;
+    --brand: #7FA6F5; --brand-ink: #091633; --brand-soft: #172B4F;
+    --warm: #F4A26B; --warm-soft: #3A2516; --glow1: rgba(127,166,245,.16); --glow2: rgba(56,189,248,.12);
+  }
+  :root:not([data-theme="light"]) {
+    --bg: #0A1615; --surface: #102220; --ink: #E5F2F0; --muted: #9AB6B1; --line: #21403B;
+    --brand: #3EC4B4; --brand-ink: #032420; --brand-soft: #123A36;
+    --warm: #F2A07B; --warm-soft: #3B2418;
+    --glow1: rgba(62,196,180,.16); --glow2: rgba(242,160,123,.14);
+    --wa-bg: #0B141A; --wa-in: #202C33; --wa-out: #005C4B; --wa-ink: #E9EDEF; --wa-meta: #8696A0;
+    --wa-head: #202C33; --wa-input: #2A3942; --wa-tick: #53BDEB; --wa-chip: #3A3418; --wa-chip-ink: #F1E3A6;
+    --frame: #000000; --shadow: 0 30px 60px -28px rgba(0,0,0,.8);
+    color-scheme: dark;
+  }
+  :root:not([data-theme="light"])[data-palette="plum"] {
+    --bg: #150D14; --surface: #21141F; --ink: #F4E8F1; --muted: #BCA3B5; --line: #3B2636;
+    --brand: #D77EC2; --brand-ink: #2A0D24; --brand-soft: #3C1E36;
+    --warm: #E2B189; --warm-soft: #3A2A1C; --glow1: rgba(215,126,194,.15); --glow2: rgba(226,177,137,.12);
+  }
+  :root:not([data-theme="light"])[data-palette="navy"] {
+    --bg: #09111E; --surface: #101B2D; --ink: #E6EDF7; --muted: #9EB0C7; --line: #22324A;
+    --brand: #82AAEA; --brand-ink: #0A1630; --brand-soft: #1A2C4A;
+    --warm: #4CD3A5; --warm-soft: #12372C; --glow1: rgba(130,170,234,.15); --glow2: rgba(76,211,165,.12);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0A1615; --surface: #102220; --ink: #E5F2F0; --muted: #9AB6B1; --line: #21403B;
+  --brand: #3EC4B4; --brand-ink: #032420; --brand-soft: #123A36;
+  --warm: #F2A07B; --warm-soft: #3B2418;
+  --glow1: rgba(62,196,180,.16); --glow2: rgba(242,160,123,.14);
+  --wa-bg: #0B141A; --wa-in: #202C33; --wa-out: #005C4B; --wa-ink: #E9EDEF; --wa-meta: #8696A0;
+  --wa-head: #202C33; --wa-input: #2A3942; --wa-tick: #53BDEB; --wa-chip: #3A3418; --wa-chip-ink: #F1E3A6;
+  --frame: #000000; --shadow: 0 30px 60px -28px rgba(0,0,0,.8);
+  color-scheme: dark;
+}
+:root[data-theme="dark"][data-palette="biru"] {
+  --bg: #09101D; --surface: #101A2C; --ink: #E7EEF9; --muted: #9DB0CC; --line: #223350;
+  --brand: #7FA6F5; --brand-ink: #091633; --brand-soft: #172B4F;
+  --warm: #F4A26B; --warm-soft: #3A2516; --glow1: rgba(127,166,245,.16); --glow2: rgba(56,189,248,.12);
+}
+:root[data-theme="dark"][data-palette="plum"] {
+  --bg: #150D14; --surface: #21141F; --ink: #F4E8F1; --muted: #BCA3B5; --line: #3B2636;
+  --brand: #D77EC2; --brand-ink: #2A0D24; --brand-soft: #3C1E36;
+  --warm: #E2B189; --warm-soft: #3A2A1C; --glow1: rgba(215,126,194,.15); --glow2: rgba(226,177,137,.12);
+}
+:root[data-theme="dark"][data-palette="navy"] {
+  --bg: #09111E; --surface: #101B2D; --ink: #E6EDF7; --muted: #9EB0C7; --line: #22324A;
+  --brand: #82AAEA; --brand-ink: #0A1630; --brand-soft: #1A2C4A;
+  --warm: #4CD3A5; --warm-soft: #12372C; --glow1: rgba(130,170,234,.15); --glow2: rgba(76,211,165,.12);
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--body); font-size: 16px; line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; }
+.wrap {
+  max-width: 1160px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+h1, h2, h3 { font-family: var(--display); font-weight: var(--display-w); line-height: 1.08; margin: 0; text-wrap: balance; letter-spacing: var(--display-track); }
+p { margin: 0; }
+:focus-visible { outline: 3px solid var(--brand); outline-offset: 3px; border-radius: 8px; }
+
+/* Header */
+.topbar { padding-block: 20px; }
+.topbar .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.logo { display: flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: var(--display-w); font-size: calc(23px * var(--display-scale)); text-decoration: none; letter-spacing: var(--display-track); }
+.logo-mark { width: 34px; height: 34px; border-radius: 11px; background: var(--brand); color: var(--brand-ink); display: grid; place-items: center; }
+.logo b { color: var(--brand); font-weight: inherit; }
+.nav { display: flex; align-items: center; gap: 22px; font-weight: 600; font-size: 15px; }
+.nav a { text-decoration: none; color: var(--muted); }
+.nav a:hover { color: var(--ink); }
+@media (max-width: 640px) { .nav .hide-sm { display: none; } }
+
+/* Hero */
+.hero { position: relative; overflow: hidden; padding-block: 28px 72px; }
+.hero::before {
+  content: ""; position: absolute; inset: -20% -10% auto -10%; height: 120%; pointer-events: none;
+  background:
+    radial-gradient(42% 50% at 80% 30%, var(--glow1), transparent 70%),
+    radial-gradient(38% 45% at 60% 85%, var(--glow2), transparent 70%),
+    radial-gradient(34% 40% at 5% 5%, var(--glow2), transparent 70%),
+    radial-gradient(30% 35% at 30% 95%, var(--glow1), transparent 70%);
+}
+.hero .wrap { position: relative; display: grid; grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr); grid-template-areas: "copy stage" "cta stage"; gap: 28px 56px; }
+.h-copy { grid-area: copy; align-self: end; }
+.h-stage { grid-area: stage; align-self: center; }
+.h-cta { grid-area: cta; align-self: start; }
+.h-cta .ctas { margin-top: 0; }
+@media (max-width: 520px) {
+  .h-cta .btn { width: 100%; }
+  .h-cta .btn-primary { flex-wrap: wrap; padding-block: 12px; row-gap: 0; text-align: center; }
+  .h-cta .btn-primary .tag { flex-basis: 100%; font-size: 13.5px; }
+}
+@media (max-width: 920px) { .hero .wrap { grid-template-columns: minmax(0, 1fr); grid-template-areas: "copy" "stage" "cta"; gap: 32px; } .h-cta .ctas { justify-content: center; } .h-cta .fine { text-align: center; } }
+.pill {
+  display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px 6px 8px; border-radius: 999px;
+  background: var(--surface); border: 1px solid var(--line); font-size: 14px; font-weight: 600; color: var(--brand);
+}
+.pill i { width: 8px; height: 8px; border-radius: 50%; background: var(--warm); box-shadow: 0 0 0 4px var(--warm-soft); margin-left: 6px; }
+.hero h1 { font-size: calc(clamp(38px, 4.3vw, 56px) * var(--display-scale)); line-height: 1.04; margin-top: 22px; }
+.hero h1 em { font-style: normal; color: var(--brand); }
+.lead { font-size: clamp(17px, 1.6vw, 19px); color: var(--muted); margin-top: 20px; max-width: 34em; }
+.easy { display: grid; gap: 10px; margin: 24px 0 0; padding: 0; list-style: none; }
+.easy li { display: flex; gap: 10px; align-items: flex-start; font-weight: 600; }
+.easy svg { flex: none; margin-top: 3px; color: var(--brand); }
+.ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; padding: 0 22px;
+  border-radius: 14px; font-weight: 700; font-size: 16px; text-decoration: none; border: 1.5px solid transparent;
+  transition: transform .15s ease, background-color .15s ease;
+}
+.btn:hover { transform: translateY(-1px); }
+.tag { font-weight: 500; opacity: .85; }
+.btn-primary { background: var(--brand); color: var(--brand-ink); box-shadow: 0 10px 24px -12px var(--brand); }
+.btn-ghost { background: var(--surface); color: var(--ink); border-color: var(--line); }
+.fine { margin-top: 14px; font-size: 13.5px; color: var(--muted); }
+
+/* Panggung demo */
+.stage { display: flex; gap: 18px; align-items: center; justify-content: center; }
+@media (max-width: 600px) { .stage { flex-direction: column; } }
+.phone {
+  width: 100%; height: 740px; max-width: 100%;
+  background: var(--frame); border-radius: 46px; padding: 11px; box-shadow: var(--shadow);
+  position: relative; flex: none;
+}
+.phone { overflow: hidden; }
+@media (max-width: 520px) { .phone { height: 605px; border-radius: 40px; } .screen { border-radius: 30px !important; } }
+.screen { position: absolute; top: 11px; right: 11px; bottom: 11px; left: 11px; border-radius: 36px; overflow: hidden; display: flex; flex-direction: column; background: var(--wa-bg); color: var(--wa-ink); }
+.status { display: flex; justify-content: space-between; padding: 12px 24px 4px; font-size: 12.5px; font-weight: 700; background: var(--wa-head); }
+.status span:last-child { display: flex; gap: 5px; align-items: center; }
+.wa-head { display: flex; align-items: center; gap: 10px; padding: 8px 14px 10px; background: var(--wa-head); border-bottom: 1px solid rgba(127,127,127,.15); }
+.wa-head .back { color: var(--wa-meta); }
+.avatar { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 13px; background: var(--brand-soft); color: var(--brand); flex: none; }
+.who { min-width: 0; }
+.who b { display: block; font-size: 15px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.who small { color: var(--wa-meta); font-size: 12px; }
+.chat {
+  flex: 1 1 0; min-height: 0; overflow: hidden; padding: 14px 12px 8px; display: flex; flex-direction: column; gap: 6px;
+  background-image: radial-gradient(rgba(127,127,127,.10) 1px, transparent 1px); background-size: 14px 14px;
+}
+.chat-inner { margin-top: auto; display: flex; flex-direction: column; gap: 6px; }
+.day { align-self: center; font-size: 11.5px; padding: 3px 10px; border-radius: 8px; background: var(--wa-in); color: var(--wa-meta); margin-bottom: 4px; }
+.msg {
+  max-width: 84%; padding: 7px 10px 5px; border-radius: 10px; font-size: 13.5px; line-height: 1.42;
+  box-shadow: 0 1px 1px rgba(0,0,0,.08); position: relative; animation: pop .28s ease-out both;
+  overflow-wrap: anywhere;
+}
+.msg.in { align-self: flex-start; background: var(--wa-in); border-top-left-radius: 3px; }
+.msg.out { align-self: flex-end; background: var(--wa-out); border-top-right-radius: 3px; }
+.meta { display: flex; justify-content: flex-end; align-items: center; gap: 3px; font-size: 10.5px; color: var(--wa-meta); margin-top: 2px; }
+.meta .tick { color: var(--wa-tick); }
+.by { font-size: 10.5px; color: var(--wa-meta); margin: -2px 0 4px 4px; align-self: flex-start; }
+.note {
+  align-self: center; display: flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 600;
+  padding: 5px 10px; border-radius: 8px; background: var(--wa-chip); color: var(--wa-chip-ink); animation: pop .28s ease-out both; text-align: center;
+}
+.photo { width: 190px; max-width: 100%; aspect-ratio: 380 / 512; border-radius: 7px; margin-bottom: 5px; background: #C98E6B url("data:image/jpeg;base64,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") center / cover no-repeat; }
+.typing { align-self: flex-start; background: var(--wa-in); border-radius: 10px; padding: 10px 12px; display: flex; gap: 4px; animation: pop .2s ease-out both; }
+.typing span { width: 6px; height: 6px; border-radius: 50%; background: var(--wa-meta); animation: blink 1s infinite; }
+.typing span:nth-child(2) { animation-delay: .15s; } .typing span:nth-child(3) { animation-delay: .3s; }
+.report b { font-weight: 700; }
+.report .rline { display: flex; justify-content: space-between; gap: 12px; font-variant-numeric: tabular-nums; }
+.report .warn { color: #D14343; }
+.composer { display: flex; align-items: center; gap: 8px; padding: 8px 10px 14px; }
+.field { flex: 1 1 0; width: 0; min-width: 0; min-height: 40px; border-radius: 22px; background: var(--wa-input); padding: 9px 14px; font-size: 13.5px; color: var(--wa-meta); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.field.filled { color: var(--wa-ink); }
+.send { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: #1DAA61; color: #fff; flex: none; }
+@keyframes pop { from { opacity: 0; transform: translateY(6px) scale(.98); } to { opacity: 1; transform: none; } }
+@keyframes blink { 0%, 100% { opacity: .3; } 50% { opacity: 1; } }
+
+.phone-wrap { position: relative; flex: none; width: 360px; max-width: 100%; }
+@media (max-width: 520px) { .phone-wrap { width: 330px; } }
+.float-chip {
+  position: absolute; z-index: 2; display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 16px;
+  background: var(--surface); border: 1px solid var(--line); box-shadow: 0 18px 36px -20px rgba(0,0,0,.4);
+  font-size: 13px; font-weight: 600; line-height: 1.3; white-space: nowrap; animation: melayang 5s ease-in-out infinite alternate;
+}
+.float-chip small { display: block; font-weight: 500; color: var(--muted); font-size: 12px; }
+.float-chip .ic { width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center; background: var(--brand-soft); color: var(--brand); flex: none; }
+.chip-a { top: 16%; right: -28px; }
+.chip-b { bottom: 12%; left: -48px; animation-delay: -2.5s; }
+@keyframes melayang { from { transform: translateY(-6px); } to { transform: translateY(6px); } }
+@media (max-width: 1180px) { .chip-a { right: -8px; } .chip-b { left: -20px; } }
+@media (max-width: 920px) { .float-chip { display: none; } }
+.rail { display: flex; flex-direction: column; gap: 10px; padding: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 22px; box-shadow: 0 18px 40px -26px rgba(0,0,0,.35); }
+@media (max-width: 600px) { .rail { flex-direction: row; flex-wrap: wrap; justify-content: center; border-radius: 18px; } }
+.tab {
+  display: flex; align-items: center; gap: 10px; padding: 10px 14px 10px 10px; border-radius: 14px; border: 0; cursor: pointer;
+  background: transparent; color: var(--muted); font: 600 14px var(--body); text-align: left; position: relative; overflow: hidden;
+}
+.tab .ic { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: var(--brand-soft); color: var(--brand); flex: none; }
+.tab[aria-selected="true"] { background: var(--brand); color: var(--brand-ink); }
+.tab[aria-selected="true"] .ic { background: rgba(255,255,255,.18); color: var(--brand-ink); }
+.tab .bar { position: absolute; left: 0; bottom: 0; height: 3px; width: 0; background: var(--warm); }
+@media (max-width: 480px) { .tab { padding: 8px 10px 8px 8px; font-size: 13px; } .tab .ic { width: 28px; height: 28px; } }
+.caption { text-align: center; font-size: 13px; color: var(--muted); margin-top: 14px; }
+
+/* Masalah */
+.pains { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 40px; }
+@media (max-width: 860px) { .pains { grid-template-columns: minmax(0, 1fr); } }
+.pain { padding: 26px 24px; border-radius: 20px; background: var(--surface); border: 1px solid var(--line); display: grid; gap: 8px; align-content: start; }
+.pain .q { font-family: var(--display); font-weight: var(--display-w); font-size: calc(20px * var(--display-scale)); line-height: 1.25; letter-spacing: var(--display-track); }
+.pain p { color: var(--muted); }
+.pain .t { font-size: 13px; font-weight: 700; color: var(--warm); font-variant-numeric: tabular-nums; }
+
+/* Fitur */
+section { padding-block: 80px; }
+.kicker { font-weight: 700; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--warm); }
+.sec-head { max-width: 640px; }
+.sec-head h2 { font-size: calc(clamp(30px, 3.8vw, 44px) * var(--display-scale)); margin-top: 10px; }
+.sec-head p { color: var(--muted); margin-top: 14px; font-size: 17px; }
+.features { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; margin-top: 44px; background: var(--line); border: 1px solid var(--line); border-radius: 24px; overflow: hidden; }
+@media (max-width: 760px) { .features { grid-template-columns: minmax(0, 1fr); } }
+.feat { background: var(--surface); padding: 30px 28px 32px; display: grid; gap: 12px; align-content: start; }
+.feat .ic { width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; background: var(--brand-soft); color: var(--brand); }
+.feat h3 { font-size: calc(22px * var(--display-scale)); margin-top: 6px; }
+.feat p { color: var(--muted); }
+.feat .stamp { justify-self: start; font-size: 12.5px; font-weight: 700; padding: 4px 10px; border-radius: 8px; background: var(--warm-soft); color: var(--ink); }
+
+/* AI khusus klinik */
+.compare { margin-top: 40px; background: var(--surface); border: 1px solid var(--line); border-radius: 24px; overflow: hidden; }
+.crow { display: grid; grid-template-columns: minmax(0, 170px) minmax(0, 1fr) minmax(0, 1fr); border-top: 1px solid var(--line); }
+.crow:first-child { border-top: 0; }
+.crow > div { padding: 18px 22px; display: flex; gap: 10px; align-items: flex-start; min-width: 0; }
+.crow .topic { font-weight: 700; }
+.crow .them { color: var(--muted); }
+.crow .us { background: var(--brand-soft); }
+.crow svg { flex: none; margin-top: 4px; }
+.crow .them svg { color: var(--muted); }
+.crow .us svg { color: var(--brand); }
+.chead > div { padding-block: 14px; font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.chead .us { color: var(--brand); }
+@media (max-width: 760px) {
+  .crow { grid-template-columns: minmax(0, 1fr); }
+  .crow .topic { padding-bottom: 4px; }
+  .crow .them { padding-block: 4px 10px; }
+  .crow .us { margin: 0 14px 16px; border-radius: 14px; }
+  .chead { display: none; }
+}
+
+/* Perbandingan jawaban */
+.vs-list { display: grid; gap: 18px; margin-top: 36px; }
+.vs { background: var(--surface); border: 1px solid var(--line); border-radius: 24px; padding: 20px; display: grid; gap: 14px; }
+.vs-q { display: flex; justify-content: flex-end; }
+.bub { max-width: 100%; padding: 9px 12px 8px; border-radius: 12px; font-size: 14.5px; line-height: 1.45; box-shadow: 0 1px 1px rgba(0,0,0,.06); }
+.bub.pasien { background: var(--wa-out); color: var(--wa-ink); border-top-right-radius: 3px; max-width: 520px; }
+.bub.balas { background: var(--wa-in); color: var(--wa-ink); border-top-left-radius: 3px; }
+.vs-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 640px) { .vs-grid { grid-template-columns: minmax(0, 1fr); } }
+.vs-col { border-radius: 16px; padding: 14px; display: grid; gap: 10px; align-content: start; background: var(--wa-bg); }
+.vs-head { display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
+.vs-head svg { flex: none; }
+.vs-col.buruk .vs-head { color: #B54141; }
+.vs-col.baik .vs-head { color: var(--brand); }
+.vs-col.baik { background: var(--brand-soft); }
+.vs-verdict { justify-self: start; font-size: 12.5px; font-weight: 700; padding: 4px 10px; border-radius: 999px; }
+.vs-col.buruk .vs-verdict { background: rgba(181,65,65,.12); color: #B54141; }
+.vs-col.baik .vs-verdict { background: var(--surface); color: var(--brand); }
+
+/* Harga */
+.price-wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 440px); grid-template-areas: "head card" "benefit card"; grid-template-rows: auto 1fr; gap: 28px 56px; align-items: start; }
+.p-head { grid-area: head; }
+.price-wrap .card { grid-area: card; }
+.p-benefit { grid-area: benefit; }
+.p-benefit h3 { font-size: calc(22px * var(--display-scale)); }
+.p-benefit .easy { margin-top: 16px; }
+@media (max-width: 920px) { .price-wrap { grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "card" "benefit"; } }
+.incl { list-style: none; padding: 0; margin: 28px 0 0; display: grid; gap: 14px; }
+.incl li { display: flex; gap: 12px; align-items: flex-start; }
+.incl svg { flex: none; color: var(--brand); margin-top: 3px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 28px; padding: 30px; box-shadow: var(--shadow); }
+.row { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+.row + .row { margin-top: 22px; }
+.lbl { font-weight: 700; }
+.lbl small { display: block; font-weight: 500; color: var(--muted); font-size: 13.5px; }
+.amt { font-family: var(--display); font-weight: var(--display-w); font-size: calc(32px * var(--display-scale)); letter-spacing: var(--display-track); font-variant-numeric: tabular-nums; text-align: right; }
+.amt s { display: block; font-family: var(--body); font-size: 14px; font-weight: 500; color: var(--muted); letter-spacing: 0; }
+.amt span { font-family: var(--body); font-size: 15px; font-weight: 600; color: var(--muted); letter-spacing: 0; }
+.promo { display: inline-block; margin-top: 6px; font-size: 12.5px; font-weight: 700; padding: 3px 9px; border-radius: 7px; background: var(--warm-soft); color: var(--ink); }
+.total { margin-top: 26px; padding-top: 20px; border-top: 1px dashed var(--line); font-size: 15px; color: var(--muted); }
+.total b { color: var(--ink); font-size: 17px; }
+.guarantee { margin-top: 20px; display: flex; gap: 12px; padding: 16px; border-radius: 16px; background: var(--brand-soft); font-size: 14.5px; }
+.guarantee svg { flex: none; color: var(--brand); margin-top: 2px; }
+.card .btn { width: 100%; margin-top: 22px; }
+.missing { margin-top: 10px; font-size: 12.5px; color: var(--muted); text-align: center; border: 1px dashed var(--line); border-radius: 10px; padding: 6px; }
+
+.closing { padding-block: 0 88px; }
+.closing .box { background: var(--brand); color: var(--brand-ink); border-radius: 30px; padding: 48px clamp(22px, 5vw, 56px); display: flex; flex-wrap: wrap; gap: 24px; align-items: center; justify-content: space-between; }
+.closing h2 { font-size: calc(clamp(26px, 3.2vw, 38px) * var(--display-scale)); max-width: 18em; }
+.closing .btn { background: var(--brand-ink); color: var(--brand); }
+footer { border-top: 1px solid var(--line); padding-block: 28px 36px; color: var(--muted); font-size: 14px; }
+footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; }
+
+/* Animasi logo AI: terus berpikir */
+.side { display: flex; flex-direction: column; gap: 20px; align-items: center; }
+.ai-brain { display: grid; justify-items: center; gap: 12px; text-align: center; width: 170px; }
+.brain { position: relative; width: 128px; height: 128px; }
+.brain::before {
+  content: ""; position: absolute; inset: -14px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(59,111,224,.42), rgba(125,211,252,.18) 45%, transparent 68%);
+  animation: denyut 3s ease-in-out infinite;
+}
+.brain svg { position: relative; width: 100%; height: 100%; display: block; overflow: visible; }
+.brain .r1 { transform-origin: 70px 70px; transform-box: view-box; animation: putar 26s linear infinite; }
+.brain .r2 { transform-origin: 70px 70px; transform-box: view-box; animation: putar 13s linear infinite reverse; }
+.brain .r3 { transform-origin: 70px 70px; transform-box: view-box; animation: putar 7s linear infinite; }
+.brain .inti { transform-origin: 70px 70px; transform-box: view-box; animation: napas 3s ease-in-out infinite; }
+.brain .sinyal { stroke-dasharray: 5 60; animation: alir 2.2s linear infinite; }
+.brain .sinyal:nth-of-type(2n) { animation-delay: -.7s; } .brain .sinyal:nth-of-type(3n) { animation-delay: -1.4s; }
+.brain .node { animation: nyala 1.8s ease-in-out infinite; }
+.ai-brain.busy .r2 { animation-duration: 4s; } .ai-brain.busy .r3 { animation-duration: 2.2s; }
+.ai-brain.busy .sinyal { animation-duration: .9s; } .ai-brain.busy .node { animation-duration: .7s; }
+.ai-brain.busy .brain::before { animation-duration: 1.1s; }
+.ai-name { font-weight: 800; font-size: 15px; letter-spacing: -0.01em; }
+.ai-status { display: block; min-height: 2.8em; font-size: 12.5px; font-weight: 600; color: var(--muted); line-height: 1.35; }
+.ai-status i { display: inline-block; vertical-align: 1px; margin-right: 6px; width: 7px; height: 7px; border-radius: 50%; background: #25D366; box-shadow: 0 0 0 3px rgba(37,211,102,.18); flex: none; }
+.ai-brain.busy .ai-status i { background: #3B6FE0; box-shadow: 0 0 0 3px rgba(59,111,224,.2); animation: blink .8s infinite; }
+@keyframes denyut { 0%, 100% { transform: scale(.94); opacity: .75; } 50% { transform: scale(1.06); opacity: 1; } }
+@keyframes putar { to { transform: rotate(360deg); } }
+@keyframes napas { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+@keyframes alir { from { stroke-dashoffset: 65; } to { stroke-dashoffset: 0; } }
+@keyframes nyala { 0%, 100% { opacity: .45; } 50% { opacity: 1; } }
+@media (max-width: 600px) {
+  .side { width: 100%; }
+  .ai-brain { width: auto; display: flex; align-items: center; gap: 14px; text-align: left; }
+  .brain { width: 76px; height: 76px; }
+  .ai-status { min-height: 0; }
+}
+
+/* Tombol coba chat yang melayang */
+.fab {
+  position: fixed; z-index: 30;
+  right: calc(18px + env(safe-area-inset-right, 0px)); bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  display: inline-flex; align-items: center; gap: 10px; padding: 14px 20px 14px 16px; border-radius: 999px;
+  background: var(--brand); color: var(--brand-ink); text-decoration: none; font-weight: 700; font-size: 15px;
+  box-shadow: 0 16px 34px -12px var(--brand), 0 4px 10px rgba(0,0,0,.12); transition: transform .15s ease;
+}
+.fab:hover { transform: translateY(-2px); }
+.fab .dot { position: absolute; top: 8px; left: 38px; width: 10px; height: 10px; border-radius: 50%; background: #25D366; border: 2px solid var(--brand); }
+.fab .short { display: none; }
+@media (max-width: 520px) { .fab { padding: 13px 16px 13px 14px; font-size: 14px; } .fab .long { display: none; } .fab .short { display: inline; } }
+footer { padding-bottom: 96px !important; }
+
+/* Pemilih warna (sementara, untuk memilih palet) */
+.palette { background: var(--surface); border-bottom: 1px solid var(--line); font-size: 13.5px; padding-block: 12px; }
+.palette .wrap { display: grid; grid-template-columns: auto auto minmax(0, 1fr); gap: 10px 18px; align-items: center; }
+@media (max-width: 860px) { .palette .wrap { grid-template-columns: minmax(0, 1fr); } }
+.palette-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.palette-top b { font-size: 13px; }
+.palette-toggle { border: 0; background: transparent; color: var(--muted); font: 600 12.5px var(--body); cursor: pointer; padding: 4px 6px; }
+.swatches { display: flex; gap: 8px; }
+.sw { border: 1.5px solid var(--line); background: var(--bg); border-radius: 12px; padding: 7px 10px; cursor: pointer; color: var(--ink); font: 600 12.5px var(--body); display: flex; gap: 8px; align-items: center; }
+.sw[aria-pressed="true"] { border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-soft); }
+.dots { display: flex; }
+.dots i { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--surface); margin-left: -5px; }
+.dots i:first-child { margin-left: 0; }
+.why { color: var(--muted); line-height: 1.5; min-width: 0; }
+.why b { color: var(--ink); }
+.palette.min .swatches, .palette.min .why { display: none; }
+@media (max-width: 480px) { .swatches { flex-wrap: wrap; } .sw { flex: 1 1 30%; justify-content: center; flex-direction: column; gap: 4px; } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+<script>document.documentElement.setAttribute("data-palette", "biru");</script>
+
+
+
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="logo" href="#top" aria-label="ChatKlinik">
+      <span class="logo-mark" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.6-5.3A8.4 8.4 0 1 1 21 11.5z"/><path d="M12 8v6M9 11h6"/></svg>
+      </span>
+      <span>Chat<b>Klinik</b></span>
+    </a>
+    <nav class="nav">
+      <a href="#ai-klinik" class="hide-sm">Keunggulan</a>
+      <a href="#harga">Harga</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero" style="padding-block: 28px 72px;">
+    <div class="wrap">
+      <div class="h-copy">
+        <span class="pill"><i></i>Khusus klinik kecantikan</span>
+        <h1>Asisten WhatsApp otomatis untuk <em>klinik kecantikan</em></h1>
+        <p class="lead">Jawab chat pasien 24 jam dengan luwes.</p>
+      </div>
+
+      <div class="h-stage">
+        <div class="stage">
+          <div class="side">
+          <div class="ai-brain" id="ai-brain" aria-live="polite">
+            <div class="brain" aria-hidden="true">
+              <svg viewBox="0 0 140 140">
+                <defs>
+                  <radialGradient id="intiGrad" cx="34%" cy="28%" r="80%">
+                    <stop offset="0" stop-color="#A9CBFF"/><stop offset=".45" stop-color="#3B6FE0"/><stop offset="1" stop-color="#11286A"/>
+                  </radialGradient>
+                  <linearGradient id="cincinGrad" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stop-color="#A9CBFF"/><stop offset="1" stop-color="#1E4FB8"/>
+                  </linearGradient>
+                </defs>
+                <g class="r1"><circle cx="70" cy="70" r="66" fill="none" stroke="#3B6FE0" stroke-opacity=".35" stroke-width="1" stroke-dasharray="1.5 6"/></g>
+                <g class="r2"><circle cx="70" cy="70" r="57" fill="none" stroke="url(#cincinGrad)" stroke-width="1.6" stroke-dasharray="42 18 6 18" stroke-linecap="round"/><circle cx="70" cy="13" r="3.2" fill="#A9CBFF"/></g>
+                <g class="r3"><circle cx="70" cy="70" r="48" fill="none" stroke="#3B6FE0" stroke-opacity=".3" stroke-width="1"/><circle cx="118" cy="70" r="2.4" fill="#3B6FE0"/><circle cx="22" cy="70" r="1.8" fill="#A9CBFF"/></g>
+                <g class="inti">
+                  <circle cx="70" cy="70" r="40" fill="url(#intiGrad)"/>
+                  <ellipse cx="58" cy="50" rx="18" ry="9" fill="#FFFFFF" fill-opacity=".18"/>
+                  <g stroke="#FFFFFF" stroke-opacity=".28" stroke-width="1.1"><line x1="70" y1="50" x2="54" y2="60"/><line x1="70" y1="50" x2="86" y2="60"/><line x1="54" y1="60" x2="70" y2="66"/><line x1="86" y1="60" x2="70" y2="66"/><line x1="70" y1="66" x2="62" y2="78"/><line x1="70" y1="66" x2="78" y2="78"/><line x1="54" y1="60" x2="52" y2="76"/><line x1="86" y1="60" x2="88" y2="76"/><line x1="52" y1="76" x2="62" y2="78"/><line x1="88" y1="76" x2="78" y2="78"/><line x1="62" y1="78" x2="78" y2="78"/><line x1="70" y1="50" x2="70" y2="66"/></g>
+                  <g stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round"><line class="sinyal" x1="70" y1="50" x2="54" y2="60"/><line class="sinyal" x1="70" y1="50" x2="86" y2="60"/><line class="sinyal" x1="54" y1="60" x2="70" y2="66"/><line class="sinyal" x1="86" y1="60" x2="70" y2="66"/><line class="sinyal" x1="70" y1="66" x2="62" y2="78"/><line class="sinyal" x1="70" y1="66" x2="78" y2="78"/><line class="sinyal" x1="54" y1="60" x2="52" y2="76"/><line class="sinyal" x1="86" y1="60" x2="88" y2="76"/><line class="sinyal" x1="52" y1="76" x2="62" y2="78"/><line class="sinyal" x1="88" y1="76" x2="78" y2="78"/><line class="sinyal" x1="62" y1="78" x2="78" y2="78"/><line class="sinyal" x1="70" y1="50" x2="70" y2="66"/></g>
+                  <g fill="#FFFFFF"><circle class="node" cx="70" cy="50" r="3.2" style="animation-delay:0.00s"/><circle class="node" cx="54" cy="60" r="2.4" style="animation-delay:-0.23s"/><circle class="node" cx="86" cy="60" r="2.4" style="animation-delay:-0.46s"/><circle class="node" cx="62" cy="78" r="2.4" style="animation-delay:-0.69s"/><circle class="node" cx="78" cy="78" r="2.4" style="animation-delay:-0.92s"/><circle class="node" cx="70" cy="66" r="3.2" style="animation-delay:-1.15s"/><circle class="node" cx="52" cy="76" r="2.4" style="animation-delay:-1.38s"/><circle class="node" cx="88" cy="76" r="2.4" style="animation-delay:-1.61s"/></g>
+                </g>
+              </svg>
+            </div>
+            <div>
+              <div class="ai-name">AI khusus klinik</div>
+              <div class="ai-status"><i></i><span id="ai-status">Memantau chat masuk</span></div>
+            </div>
+          </div>
+          <div class="rail" role="tablist" aria-label="Contoh percakapan" id="rail"></div>
+        </div>
+          <div class="phone-wrap">
+          <div class="float-chip chip-b" aria-hidden="true"><span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><span>Booking tercatat otomatis<small>di sheet Prospek admin</small></span></div>
+          <div class="phone" aria-label="Simulasi percakapan WhatsApp">
+            <div class="screen">
+              <div class="status"><span id="clock">21.14</span><span>
+                <svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor" aria-hidden="true"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.3" y="5" width="3" height="6" rx="1"/><rect x="8.6" y="2.5" width="3" height="8.5" rx="1"/><rect x="12.9" y="0" width="3" height="11" rx="1"/></svg>
+                <svg width="22" height="11" viewBox="0 0 22 11" fill="none" aria-hidden="true"><rect x=".5" y=".5" width="18" height="10" rx="3" stroke="currentColor"/><rect x="2" y="2" width="12" height="7" rx="1.5" fill="currentColor"/><rect x="19.5" y="3.5" width="2" height="4" rx="1" fill="currentColor"/></svg>
+              </span></div>
+              <div class="wa-head">
+                <svg class="back" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+                <div class="avatar" id="avatar">AD</div>
+                <div class="who"><b id="who-name">Klinik Aura Derma</b><small id="who-sub">online</small></div>
+              </div>
+              <div class="chat" id="chat"><div class="chat-inner" id="chat-inner"></div></div>
+              <div class="composer">
+                <div class="field" id="field">Ketik pesan</div>
+                <div class="send" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3.4 20.4 21 12 3.4 3.6 3.4 10l12.6 2-12.6 2z"/></svg></div>
+              </div>
+            </div>
+          </div>
+          </div>
+        </div>
+        <p class="caption" id="caption">Simulasi percakapan dengan klinik contoh</p>
+      </div>
+      <div class="h-cta">
+        <div class="ctas">
+          <a class="btn btn-primary" id="cta-demo" href="#" target="_blank" rel="noopener">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .1-1.3c0-.1-.2-.2-.4-.3z"/></svg>
+            Coba chat Klinik Aura Derma <span class="tag">(simulasi demo)</span>
+          </a>
+          <a class="btn btn-ghost" href="#harga">Lihat harga</a>
+        </div>
+        <p class="fine">Klinik Aura Derma adalah klinik contoh. Coba tanya harga, minta booking, atau kirim foto kulit, lalu lihat sendiri cara asisten membalas.</p>
+      </div>
+    </div>
+  </section>
+
+
+  <section id="ai-klinik" style="padding-top: 24px;">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="kicker">AI khusus klinik</span>
+        <h2>Menggunakan AI yang dirancang khusus untuk klinik</h2>
+        <p>Pertanyaan pasien yang sama, jawaban yang berbeda.</p>
+      </div>
+      <div class="vs-list">
+        <div class="vs">
+          <div class="vs-q"><div class="bub pasien">Kak, Facial Brightening harganya berapa?</div></div>
+          <div class="vs-grid">
+            <div class="vs-col buruk"><span class="vs-head"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>Chatbot AI biasa</span><div class="bub balas">Harganya sekitar Rp200 ribuan, Kak.</div><span class="vs-verdict">Menebak harga</span></div>
+            <div class="vs-col baik"><span class="vs-head"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Asisten ChatKlinik</span><div class="bub balas">Facial Brightening Rp300.000, durasi 60 menit oleh terapis.</div><span class="vs-verdict">Sesuai daftar harga klinik</span></div>
+          </div>
+        </div>
+        <div class="vs">
+          <div class="vs-q"><div class="bub pasien">Jerawatku lagi merah meradang, cocoknya treatment apa ya?</div></div>
+          <div class="vs-grid">
+            <div class="vs-col buruk"><span class="vs-head"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>Chatbot AI biasa</span><div class="bub balas">Kakak cocok pakai Chemical Peeling, dijamin cepat kempes!</div><span class="vs-verdict">Sok tahu soal medis</span></div>
+            <div class="vs-col baik"><span class="vs-head"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Asisten ChatKlinik</span><div class="bub balas">Untuk kondisi kulit saya tidak memberi saran supaya tidak keliru. Saya teruskan ke admin dan tim klinik ya, Kak.</div><span class="vs-verdict">Langsung dioper ke admin</span></div>
+          </div>
+        </div>
+        <div class="vs">
+          <div class="vs-q"><div class="bub pasien">Ini yang balas orang atau bot sih?</div></div>
+          <div class="vs-grid">
+            <div class="vs-col buruk"><span class="vs-head"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>Chatbot AI biasa</span><div class="bub balas">Saya admin klinik, Kak.</div><span class="vs-verdict">Mengaku manusia</span></div>
+            <div class="vs-col baik"><span class="vs-head"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Asisten ChatKlinik</span><div class="bub balas">Saya asisten otomatis Klinik Aura Derma, Kak. Kalau perlu, saya sambungkan ke admin.</div><span class="vs-verdict">Jujur ke pasien</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section id="harga">
+    <div class="wrap price-wrap">
+      <div class="sec-head p-head">
+        <span class="kicker">Harga</span>
+        <h2>Semua diurus oleh kami</h2>
+        <p>Anda cukup kirim daftar harga, jadwal dokter, dan promo. Sisanya kami kerjakan.</p>
+      </div>
+
+      <div class="card">
+        <div class="row">
+          <div class="lbl">Pemasangan<small>Sekali bayar</small><span class="promo">Promo 3 klinik pertama</span></div>
+          <div class="amt"><s>Rp2.500.000</s>Rp1.000.000</div>
+        </div>
+        <div class="row">
+          <div class="lbl">Langganan<small>Bisa berhenti kapan saja</small></div>
+          <div class="amt">Rp750.000<span>/bulan</span></div>
+        </div>
+        <p class="total">Bayar pertama <b>Rp1.750.000</b>, sudah termasuk pemasangan dan bulan pertama.</p>
+        <div class="guarantee">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+          <p><b>Garansi 14 hari.</b> Kalau dalam 14 hari ChatKlinik tidak membantu klinik Anda, biaya pemasangan kami kembalikan 100%.</p>
+        </div>
+        <a class="btn btn-primary" id="cta-order" href="#" target="_blank" rel="noopener"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .1-1.3c0-.1-.2-.2-.4-.3z"/></svg>Hubungi kami</a>
+        <p class="fine" style="text-align:center;margin-top:10px">Dibalas langsung oleh tim ChatKlinik lewat WhatsApp.</p>
+        <p class="missing" id="missing">Nomor WhatsApp ChatKlinik untuk pemesanan belum diisi.</p>
+      </div>
+      <div class="p-benefit">
+        <h3>Yang klinik Anda dapat</h3>
+          <ul class="easy incl-b">
+            <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Bantu admin supaya tidak ada prospek yang terlewat.</li>
+            <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Kirim laporan harian ke HP owner setiap jam 9 malam.</li>
+            <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Klinik tinggal terima beres, gak perlu ribet setting AI-nya.</li>
+            <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Langsung pakai WhatsApp biasa, gak perlu pindah aplikasi.</li>
+          </ul>
+      </div>
+    </div>
+  </section>
+</main>
+
+<a class="fab" id="cta-fab" href="#" target="_blank" rel="noopener" aria-label="Coba chat Klinik Aura Derma lewat WhatsApp, simulasi demo">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .1-1.3c0-.1-.2-.2-.4-.3z"/></svg>
+  <span class="dot" aria-hidden="true"></span>
+  <span class="long">Coba chat Klinik Aura Derma <span class="tag">(simulasi demo)</span></span><span class="short">Coba chat (simulasi demo)</span>
+</a>
+
+<footer>
+  <div class="wrap">
+    <span><b>ChatKlinik</b> · Asisten WhatsApp untuk klinik kecantikan</span>
+    <span>Klinik Aura Derma dan isi percakapan di halaman ini adalah contoh.</span>
+  </div>
+</footer>
+
+
+
+<script>
+// ---- Pengaturan yang bisa diganti ----
+const NOMOR_DEMO = '6287818984275';   // nomor WhatsApp Klinik Aura Derma (bot demo)
+const PESAN_DEMO = 'Halo kak, mau tanya-tanya perawatan wajah';
+const NOMOR_PEMESANAN = '6282219253492';           // nomor WhatsApp ChatKlinik untuk pemesanan, contoh '62812xxxx'
+const PESAN_PEMESANAN = 'Halo, saya tertarik pasang ChatKlinik untuk klinik saya';
+
+const waLink = (n, t) => `https://wa.me/${n}?text=${encodeURIComponent(t)}`;
+for (const id of ['cta-demo', 'cta-fab']) { const el = document.getElementById(id); if (el) el.href = waLink(NOMOR_DEMO, PESAN_DEMO); }
+const order = document.getElementById('cta-order');
+if (NOMOR_PEMESANAN) { order.href = waLink(NOMOR_PEMESANAN, PESAN_PEMESANAN); document.getElementById('missing').hidden = true; }
+else { order.href = '#harga'; order.removeAttribute('target'); }
+
+// ---- Simulasi chat ----
+const IKON = {
+  harga: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg>',
+  booking: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>',
+  foto: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+  laporan: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 5-6"/></svg>',
+};
+const SKENARIO = [
+  { id: 'harga', label: 'Tanya harga', jam: '21.14', kontak: ['AD', 'Klinik Aura Derma', 'online'],
+    caption: 'Pasien bertanya jam 9 malam, langsung dijawab dari daftar harga klinik',
+    langkah: [
+      { s: 'out', t: 'Malam kak, ada treatment buat wajah kusam nggak? Kisaran harganya berapa ya?' },
+      { s: 'in', pikir: 'Mencocokkan daftar harga klinik', t: 'Halo Kak, saya asisten otomatis Klinik Aura Derma. Untuk wajah kusam ada <b>Facial Brightening</b>, Rp300.000, durasi 60 menit oleh terapis. Supaya pasti cocok, Kakak bisa konsultasi dokter dulu (Rp100.000, gratis kalau lanjut perawatan di hari yang sama).' },
+    ] },
+  { id: 'booking', label: 'Booking', jam: '21.16', kontak: ['AD', 'Klinik Aura Derma', 'online'],
+    caption: 'Data booking dikumpulkan sampai lengkap, lalu diserahkan ke admin',
+    langkah: [
+      { s: 'out', t: 'Kalau ambil Facial Brightening buat besok jam 2 siang masih kosong kak?' },
+      { s: 'in', pikir: 'Memeriksa data booking yang kurang', t: 'Boleh, Kak. Jadwalnya nanti dicek langsung oleh admin. Boleh sebutkan nama lengkap Kakak dulu?' },
+      { s: 'out', t: 'Sinta Maharani' },
+      { s: 'in', pikir: 'Data lengkap, menyiapkan untuk admin', t: 'Baik Kak Sinta, permintaan booking Facial Brightening untuk besok jam 14.00 sudah saya catat dan saya teruskan ke admin. Mulai dari sini Kakak dibalas langsung oleh admin kami.' },
+      { s: 'note', t: 'Tercatat di sheet Prospek: Menunggu Konfirmasi' },
+    ] },
+  { id: 'foto', label: 'Konsultasi', jam: '21.20', kontak: ['AD', 'Klinik Aura Derma', 'online'],
+    caption: 'Urusan medis tidak dijawab asisten, langsung dioper ke admin',
+    langkah: [
+      { s: 'out', foto: true, t: 'Kak, jerawatku lagi merah meradang kayak gini boleh di-treatment nggak?' },
+      { s: 'in', pikir: 'Foto kulit terdeteksi, tidak dinilai AI', t: 'Terima kasih, Kak, fotonya sudah masuk. Saya asisten otomatis, jadi saya tidak menilai kondisi kulit supaya tidak keliru. Saya teruskan ke admin dan tim medis kami ya. Mulai dari sini Kakak dibalas langsung oleh admin.' },
+      { s: 'note', t: 'Admin menerima pemberitahuan: pasien mengirim foto' },
+    ] },
+  { id: 'laporan', label: 'Laporan owner', jam: '21.00', kontak: ['CK', 'ChatKlinik', 'laporan harian'],
+    caption: 'Tiap jam 21.00, ringkasan hari itu masuk ke WhatsApp owner',
+    langkah: [
+      { s: 'in', laporan: true, pikir: 'Merangkum semua chat hari ini', t:
+        '<b>Laporan chat Klinik Aura Derma</b><br>Kamis, 24 jam terakhir<br><br>' +
+        '<div class="rline"><span>Yang chat</span><b>23 orang</b></div>' +
+        '<div class="rline"><span>Orang baru</span><b>18</b></div>' +
+        '<div class="rline"><span>Minta booking</span><b>7</b></div>' +
+        '<div class="rline"><span>Sudah dikonfirmasi admin</span><b>4</b></div>' +
+        '<div class="rline warn"><span>Booking menggantung &gt;24 jam</span><b>2</b></div><br>' +
+        '<b>Pertanyaan terbanyak</b><br>1. Harga &nbsp;2. Booking &nbsp;3. Kondisi kulit' },
+    ] },
+];
+
+const rail = document.getElementById('rail');
+const inner = document.getElementById('chat-inner');
+const field = document.getElementById('field');
+const kurangGerak = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+let token = 0, aktif = 0;
+
+for (const [i, sk] of SKENARIO.entries()) {
+  const b = document.createElement('button');
+  b.className = 'tab'; b.type = 'button'; b.setAttribute('role', 'tab'); b.id = 'tab-' + sk.id;
+  b.innerHTML = `<span class="ic">${IKON[sk.id]}</span>${sk.label}<span class="bar"></span>`;
+  b.addEventListener('click', () => mainkan(i, true));
+  rail.appendChild(b);
+}
+
+const tunggu = ms => new Promise(r => setTimeout(r, kurangGerak ? 0 : ms));
+function gulir() { const c = document.getElementById('chat'); c.scrollTop = c.scrollHeight; }
+function gelembung(l, jam) {
+  if (l.s === 'note') {
+    const n = document.createElement('div'); n.className = 'note';
+    n.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>' + l.t;
+    inner.appendChild(n); return;
+  }
+  const m = document.createElement('div');
+  m.className = 'msg ' + l.s + (l.laporan ? ' report' : '');
+  m.innerHTML = (l.foto ? '<div class="photo" role="img" aria-label="Foto wajah berjerawat yang dikirim pasien"></div>' : '') + l.t +
+    `<div class="meta">${jam}${l.s === 'out' ? '<span class="tick">✓✓</span>' : ''}</div>`;
+  inner.appendChild(m);
+  if (l.s === 'in' && !l.laporan) {
+    const by = document.createElement('div'); by.className = 'by'; by.textContent = 'Dijawab asisten ChatKlinik';
+    inner.appendChild(by);
+  }
+}
+function siapkan(i) {
+  const sk = SKENARIO[i];
+  aktif = i;
+  for (const [j, b] of [...rail.children].entries()) {
+    b.setAttribute('aria-selected', String(j === i));
+    const bar = b.querySelector('.bar'); bar.style.transition = 'none'; bar.style.width = '0';
+  }
+  document.getElementById('avatar').textContent = sk.kontak[0];
+  document.getElementById('who-name').textContent = sk.kontak[1];
+  document.getElementById('who-sub').textContent = sk.kontak[2];
+  document.getElementById('clock').textContent = sk.jam;
+  document.getElementById('caption').textContent = sk.caption;
+  inner.innerHTML = '<div class="day">Hari ini</div>';
+  field.textContent = 'Ketik pesan'; field.classList.remove('filled');
+}
+const otak = document.getElementById('ai-brain');
+const statusAI = document.getElementById('ai-status');
+function pikir(teks, sibuk) { statusAI.textContent = teks; otak.classList.toggle('busy', !!sibuk); }
+function tampilLangsung(i) {
+  siapkan(i); pikir('Memantau chat masuk');
+  for (const l of SKENARIO[i].langkah) gelembung(l, SKENARIO[i].jam);
+  gulir();
+}
+async function ketik(teks, t) {
+  field.classList.add('filled'); field.textContent = '';
+  const polos = teks.replace(/<[^>]+>/g, '');
+  const langkah = Math.max(1, Math.ceil(polos.length / 40));
+  for (let k = 0; k <= polos.length; k += langkah) {
+    if (t !== token) return false;
+    field.textContent = polos.slice(Math.max(0, k - 34), k) || ' ';
+    await tunggu(28);
+  }
+  await tunggu(250);
+  field.textContent = 'Ketik pesan'; field.classList.remove('filled');
+  return t === token;
+}
+async function mainkan(i, dariKlik) {
+  const t = ++token;
+  if (kurangGerak) { tampilLangsung(i); return; }
+  siapkan(i);
+  const sk = SKENARIO[i];
+  pikir(sk.id === 'laporan' ? 'Menunggu jam 21.00' : 'Memantau chat masuk');
+  for (const l of sk.langkah) {
+    if (l.s === 'out') {
+      await tunggu(500);
+      pikir('Pasien sedang mengetik');
+      if (!(await ketik(l.t, t))) return;
+      gelembung(l, sk.jam);
+      pikir('Membaca pesan pasien', true);
+    } else if (l.s === 'in') {
+      await tunggu(500); if (t !== token) return;
+      pikir(l.pikir || 'Menyusun balasan', true);
+      const ty = document.createElement('div'); ty.className = 'typing'; ty.innerHTML = '<span></span><span></span><span></span>';
+      inner.appendChild(ty); gulir();
+      await tunggu(l.laporan ? 900 : 1400); if (t !== token) return;
+      ty.remove(); gelembung(l, sk.jam);
+      pikir('Balasan terkirim');
+    } else {
+      pikir(l.t.startsWith('Tercatat') ? 'Mencatat ke sheet Prospek' : 'Memberi tahu admin', true);
+      await tunggu(600); if (t !== token) return;
+      gelembung(l, sk.jam);
+      pikir('Selesai, kembali memantau');
+    }
+    gulir();
+  }
+  const bar = rail.children[i].querySelector('.bar');
+  bar.style.transition = 'none'; bar.style.width = '0';
+  requestAnimationFrame(() => { bar.style.transition = 'width 4.5s linear'; bar.style.width = '100%'; });
+  await tunggu(4600); if (t !== token) return;
+  mainkan((i + 1) % SKENARIO.length);
+}
+
+// Tampilan awal sudah lengkap (skenario 1), lalu animasi mulai berjalan.
+tampilLangsung(0);
+if (!kurangGerak) {
+  const bar = rail.children[0].querySelector('.bar');
+  requestAnimationFrame(() => { bar.style.transition = 'width 4s linear'; bar.style.width = '100%'; });
+  const t0 = token;
+  setTimeout(() => { if (token === t0) mainkan(1); }, 4200);
+}
+</script>
+
+</body>
+</html>
