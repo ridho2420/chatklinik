@@ -159,6 +159,11 @@ p { margin: 0; }
 .hero h1 { font-size: calc(clamp(38px, 4.3vw, 56px) * var(--display-scale)); line-height: 1.04; margin-top: 22px; }
 .hero h1 em { font-style: normal; color: var(--brand); }
 .lead { font-size: clamp(17px, 1.6vw, 19px); color: var(--muted); margin-top: 20px; max-width: 34em; }
+/* Tagline 24 jam di bawah judul utama */
+.tagline { display: flex; align-items: center; gap: 14px; color: var(--ink); font-weight: 600; font-size: clamp(18px, 1.8vw, 21px); line-height: 1.35; }
+.tagline b { color: var(--brand); font-weight: 800; }
+.t24 { flex: none; display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; background: var(--brand-soft); color: var(--brand); }
+.t24 svg { width: 40px; height: 40px; }
 .easy { display: grid; gap: 10px; margin: 24px 0 0; padding: 0; list-style: none; }
 .easy li { display: flex; gap: 10px; align-items: flex-start; font-weight: 600; }
 .easy svg { flex: none; margin-top: 3px; color: var(--brand); }
@@ -448,6 +453,16 @@ section { padding-block: 80px; }
 .p-benefit { grid-area: benefit; }
 .p-benefit h3 { font-size: calc(22px * var(--display-scale)); }
 .p-benefit .easy { margin-top: 16px; }
+/* Kartu: disesuaikan dengan cara kerja klinik */
+.fit { display: flex; gap: 16px; align-items: flex-start; margin-top: 28px; padding: 22px; border-radius: 20px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); }
+.fit-ic { flex: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; background: var(--brand-soft); color: var(--brand); }
+.fit h4 { margin: 0; font-size: 18px; line-height: 1.3; }
+.fit p { margin: 6px 0 0; color: var(--muted); font-size: 15.5px; line-height: 1.55; }
+.fit-sec { padding-block: 0; }
+.fit-sec .fit { margin: 0 auto; max-width: 820px; padding: 28px; gap: 20px; }
+.fit-sec .fit h4 { font-size: 20px; }
+.fit-sec .fit p { font-size: 16.5px; }
+@media (max-width: 520px) { .fit, .fit-sec .fit { flex-direction: column; gap: 12px; padding: 22px; } }
 @media (max-width: 920px) { .price-wrap { grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "card" "benefit"; } }
 .incl { list-style: none; padding: 0; margin: 28px 0 0; display: grid; gap: 14px; }
 .incl li { display: flex; gap: 12px; align-items: flex-start; }
@@ -584,7 +599,7 @@ footer { padding-bottom: 96px !important; }
       <div class="h-copy">
         <span class="pill"><i></i>Khusus klinik kecantikan</span>
         <h1>Asisten AI WhatsApp otomatis untuk <em>klinik kecantikan</em></h1>
-        <p class="lead">Jawab chat pasien 24 jam dengan luwes.</p>
+        <p class="lead tagline"><span class="t24"><svg width="30" height="30" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M42.22 27.21A18.5 18.5 0 1 1 40.02 14.75" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/><path d="M40.5 8.8 40.02 14.75 34.6 12.2" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/><text x="24" y="27.5" text-anchor="middle" font-size="15" font-weight="800" fill="currentColor" font-family="inherit">24</text><text x="24" y="35.5" text-anchor="middle" font-size="7" font-weight="700" letter-spacing=".08em" fill="currentColor" font-family="inherit">JAM</text></svg></span><span>Jawab chat pasien <b>24 jam</b> dengan luwes.</span></p>
       </div>
 
       <div class="h-stage">
@@ -623,7 +638,7 @@ footer { padding-bottom: 96px !important; }
           <div class="phone-wrap">
           <div class="phone" aria-label="Simulasi percakapan WhatsApp">
             <div class="screen">
-              <div class="status"><span id="clock">21.14</span><span>
+              <div class="status"><span id="clock">21.12</span><span>
                 <svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor" aria-hidden="true"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.3" y="5" width="3" height="6" rx="1"/><rect x="8.6" y="2.5" width="3" height="8.5" rx="1"/><rect x="12.9" y="0" width="3" height="11" rx="1"/></svg>
                 <svg width="22" height="11" viewBox="0 0 22 11" fill="none" aria-hidden="true"><rect x=".5" y=".5" width="18" height="10" rx="3" stroke="currentColor"/><rect x="2" y="2" width="12" height="7" rx="1.5" fill="currentColor"/><rect x="19.5" y="3.5" width="2" height="4" rx="1" fill="currentColor"/></svg>
               </span></div>
@@ -661,7 +676,7 @@ footer { padding-bottom: 96px !important; }
     <div class="wrap">
       <div class="sec-head">
         <span class="kicker">AI khusus klinik</span>
-        <h2>Menggunakan AI yang dirancang khusus untuk klinik</h2>
+        <h2>AI yang dirancang khusus untuk klinik</h2>
         <p>Pertanyaan pasien yang sama, jawaban yang berbeda.</p>
       </div>
       <div class="vs-list">
@@ -789,6 +804,17 @@ footer { padding-bottom: 96px !important; }
       </div>
     </div>
   </section>
+  <section class="fit-sec" aria-label="Penyesuaian untuk klinik">
+    <div class="wrap">
+    <div class="fit">
+      <span class="fit-ic" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg></span>
+      <div>
+        <h4>Disesuaikan dengan cara kerja klinik Anda</h4>
+        <p>Sebelum memasang, kami berdiskusi dengan Anda: gaya bahasa yang diinginkan, kapan chat perlu diteruskan ke admin, dan jam berapa asisten AI aktif. Semua pengaturan disesuaikan dengan kebutuhan klinik Anda.</p>
+      </div>
+    </div>
+    </div>
+  </section>
   <section id="harga">
     <div class="wrap price-wrap">
       <div class="sec-head p-head">
@@ -866,6 +892,13 @@ const IKON = {
   laporan: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 5-6"/></svg>',
 };
 const SKENARIO = [
+  { id: 'foto', label: 'Konsultasi', jam: '21.12', kontak: ['AD', 'Klinik Aura Derma', 'online'],
+    caption: 'Urusan medis tidak dijawab asisten AI, langsung dioper ke admin',
+    langkah: [
+      { s: 'out', foto: true, t: 'Kak, jerawatku lagi merah meradang kayak gini boleh di-treatment nggak?' },
+      { s: 'in', pikir: 'Foto kulit terdeteksi, tidak dinilai AI', t: 'Terima kasih, Kak, fotonya sudah masuk. Saya asisten AI, jadi saya tidak menilai kondisi kulit supaya tidak keliru.<br><br>Saya teruskan ke admin dan tim medis kami ya. Klinik sedang tutup, admin kami akan membalas Kakak besok mulai pukul 09.00 WIB.' },
+      { s: 'note', t: 'Admin menerima pemberitahuan: pasien mengirim foto' },
+    ] },
   { id: 'harga', label: 'Tanya harga', jam: '21.14', kontak: ['AD', 'Klinik Aura Derma', 'online'],
     caption: 'Pasien bertanya jam 9 malam, langsung dijawab dari daftar harga klinik',
     langkah: [
@@ -880,13 +913,6 @@ const SKENARIO = [
       { s: 'out', t: 'Sinta Maharani' },
       { s: 'in', pikir: 'Data lengkap, menyiapkan untuk admin', t: 'Baik Kak Sinta, permintaan booking Facial Brightening untuk besok jam 14.00 sudah saya catat dan saya teruskan ke admin. Jadwalnya belum pasti sampai admin mengonfirmasi.<br><br>Klinik sedang tutup, admin kami akan membalas Kakak besok mulai pukul 09.00 WIB.' },
       { s: 'note', t: 'Tercatat di sheet Prospek: Menunggu Konfirmasi' },
-    ] },
-  { id: 'foto', label: 'Konsultasi', jam: '21.20', kontak: ['AD', 'Klinik Aura Derma', 'online'],
-    caption: 'Urusan medis tidak dijawab asisten AI, langsung dioper ke admin',
-    langkah: [
-      { s: 'out', foto: true, t: 'Kak, jerawatku lagi merah meradang kayak gini boleh di-treatment nggak?' },
-      { s: 'in', pikir: 'Foto kulit terdeteksi, tidak dinilai AI', t: 'Terima kasih, Kak, fotonya sudah masuk. Saya asisten AI, jadi saya tidak menilai kondisi kulit supaya tidak keliru.<br><br>Saya teruskan ke admin dan tim medis kami ya. Klinik sedang tutup, admin kami akan membalas Kakak besok mulai pukul 09.00 WIB.' },
-      { s: 'note', t: 'Admin menerima pemberitahuan: pasien mengirim foto' },
     ] },
   { id: 'laporan', label: 'Laporan owner', jam: '21.00', kontak: ['CK', 'ChatKlinik', 'laporan harian'],
     caption: 'Tiap jam 21.00, ringkasan hari itu masuk ke WhatsApp owner',
