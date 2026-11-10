@@ -1,0 +1,460 @@
+{
+  "name": "Klinik - Laporan Malam",
+  "nodes": [
+    {
+      "id": "db8b248f-1d84-4158-926f-81af26e4aa2b",
+      "name": "Catatan",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "content": "## Laporan malam\nBerjalan sendiri tiap pukul 21.00 WIB dan merangkum 24 jam terakhir.\n\nUntuk mencoba tanpa menunggu malam, klik **Execute workflow** dengan trigger **Coba Sekarang**.",
+        "height": 190,
+        "width": 460,
+        "color": 4
+      }
+    },
+    {
+      "id": "e81f02cf-7cdd-4ed8-8698-80f0bceb1632",
+      "name": "Tiap Malam",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        64,
+        240
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 21 * * *"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "be0d4ffb-ceb1-41c4-82c7-04ae8fc74bff",
+      "name": "Coba Sekarang",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        64,
+        432
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "5f88eb57-c14c-4f7f-8aa6-fc602b88568e",
+      "name": "Pengaturan",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        304,
+        320
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e775adf1-1d30-44d5-a064-b0e890d1b18d",
+              "name": "nama_klinik",
+              "type": "string",
+              "value": "Klinik Aura Derma"
+            },
+            {
+              "id": "a567f631-760e-4dd6-a95d-4bccb77c1f0e",
+              "name": "supabase_url",
+              "type": "string",
+              "value": "https://YOUR_PROJECT.supabase.co"
+            },
+            {
+              "id": "f44fca66-a13a-4ad1-a985-33322f7a6fa8",
+              "name": "id_sheet_booking",
+              "type": "string",
+              "value": "YOUR_BOOKING_SHEET_ID"
+            },
+            {
+              "id": "b1c2d3e4-prospek-0001",
+              "name": "id_sheet_prospek",
+              "type": "string",
+              "value": "YOUR_PROSPECT_SHEET_ID"
+            },
+            {
+              "id": "64691bab-0a65-49ce-a061-e3dd14aae197",
+              "name": "nomor_owner",
+              "type": "string",
+              "value": "YOUR_ADMIN_WHATSAPP_NUMBER"
+            },
+            {
+              "id": "0709a7d9-a739-402f-a407-f32373088367",
+              "name": "batas_balasan_per_bulan",
+              "type": "number",
+              "value": 1400
+            },
+            {
+              "id": "4b578877-cfe1-4fc6-a9f6-fc858f86f6d9",
+              "name": "jam_laporan_mundur",
+              "type": "number",
+              "value": 24
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "92fd648c-3a0c-48d9-9f12-91e5ef982ed1",
+      "name": "Ringkasan Chat",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        528,
+        320
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Pengaturan').first().json.supabase_url.replace(/\\/+$/, '') }}/rest/v1/rpc/ringkasan_laporan",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ p_jam: $json.jam_laporan_mundur }) }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "4cf8344e-87ce-4b92-81f7-65a77172d0c7",
+      "name": "Baca Booking",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        752,
+        320
+      ],
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Pengaturan').first().json.id_sheet_booking }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Booking"
+        },
+        "options": {}
+      },
+      "executeOnce": true,
+      "alwaysOutputData": true
+    },
+    {
+      "id": "5c5ca651-af56-4a52-9b6a-bf0bed2b98d0",
+      "name": "Susun Laporan",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1184,
+        320
+      ],
+      "parameters": {
+        "jsCode": "// Menyusun laporan malam dari catatan chat (Supabase), sheet Booking, dan sheet Prospek & Booking.\nconst cfg = $('Pengaturan').first().json;\nconst r = $('Ringkasan Chat').first().json;\nconst barisBooking = $('Baca Booking').all().map(i => i.json);\nconst barisProspek = $('Baca Prospek').all().map(i => i.json);\nconst barisLog = $('Ambil Log Chat').all().map(i => i.json);\n\nfunction nomorRapi(n) {\n  let d = String(n ?? '').replace(/\\D/g, '');\n  if (d.startsWith('0')) d = '62' + d.slice(1);\n  else if (d.startsWith('8')) d = '62' + d;\n  return d;\n}\nconst kolomNomor = /(nomor|no\\.?)\\s*(hp|wa|telp|telepon|whatsapp)|^hp$|^wa$|whatsapp|telepon/i;\nconst sudahBooking = new Set();\nfor (const b of barisBooking) {\n  for (const [k, v] of Object.entries(b)) {\n    if (kolomNomor.test(k) && nomorRapi(v).length >= 9) sudahBooking.add(nomorRapi(v));\n  }\n}\n\n// Nomor bertanda \"arsip-\" adalah data uji coba yang sudah di-reset, tidak ikut dilaporkan.\nconst bukanArsip = n => !/^arsip/i.test(String(n ?? '').trim());\nconst orang = (r.orang || []).filter(o => bukanArsip(o.nomor));\nconst baru = orang.filter(o => o.baru);\nconst lama = orang.filter(o => !o.baru);\nconst iklan = baru.filter(o => o.dari_iklan);\nconst bukanIklan = baru.filter(o => !o.dari_iklan);\nconst jadi = o => sudahBooking.has(o.nomor);\n\n// Di tahap mana orang baru yang belum booking itu berhenti.\nfunction tahap(o) {\n  if (o.belum_ditanggapi || !o.tindakan_terakhir) return 'Belum ditanggapi';\n  if (o.tindakan_terakhir === 'pengingat' && o.alasan_terakhir === 'hari_baru') return 'Chat lagi keesokan hari, sudah dikabari';\n  if (o.tindakan_terakhir === 'pengingat') return 'Mulai tidak sabar, admin sudah diingatkan';\n  if (o.tindakan_terakhir === 'diam' && o.alasan_terakhir === 'ditangani_admin') return 'Diteruskan ke admin, menunggu jawaban';\n  if (o.tindakan_terakhir === 'teruskan') {\n    if (o.alasan_terakhir === 'booking') return 'Sudah minta booking, menunggu konfirmasi admin';\n    return 'Diteruskan ke admin, menunggu jawaban';\n  }\n  if (o.tindakan_terakhir === 'diam') return 'Tidak dijawab otomatis, menunggu admin';\n  const peta = {\n    harga: 'Berhenti setelah diberi harga',\n    promo: 'Berhenti setelah diberi info promo',\n    jadwal: 'Berhenti setelah diberi jadwal',\n    lokasi: 'Berhenti setelah diberi alamat',\n    booking: 'Berhenti saat ditanya data booking',\n  };\n  return peta[o.topik_terakhir] || 'Berhenti setelah pertanyaan lain';\n}\nconst hitungTahap = {};\nfor (const o of baru.filter(x => !jadi(x))) {\n  const t = tahap(o);\n  hitungTahap[t] = (hitungTahap[t] || 0) + 1;\n}\nconst urutTahap = Object.entries(hitungTahap).sort((a, b) => b[1] - a[1]);\n\n// Orang baru yang sudah masuk sheet Booking dianggap sudah ditangani admin.\nconst menunggu = orang.filter(o => !(o.baru && jadi(o)) &&\n  (o.belum_ditanggapi || ['teruskan', 'diam', 'pengingat'].includes(o.tindakan_terakhir)));\n\nconst namaTopik = {\n  harga: 'Harga', promo: 'Promo', jadwal: 'Jadwal dokter', lokasi: 'Alamat dan lokasi',\n  booking: 'Booking', kondisi_kulit: 'Kondisi kulit', komplain: 'Komplain', lainnya: 'Lain-lain',\n  menagih: 'Menagih balasan admin',\n};\nconst topik = Object.entries(r.topik || {}).sort((a, b) => b[1] - a[1]).slice(0, 3);\n\nconst iklanSemua = (r.nomor_iklan_semua || []).filter(bukanArsip);\nconst iklanSemuaJadi = iklanSemua.filter(n => sudahBooking.has(n));\nconst persen = (a, b) => (b > 0 ? ` (${Math.round((a / b) * 100)}%)` : '');\n\n// ---- Sheet Prospek & Booking ----\n// Tanggal dibaca sebagai angka seri Google Sheets dalam zona waktu WIB.\nfunction waktuDari(v) {\n  if (typeof v === 'number' && v > 0) return (v - 25569) * 86400000 - 7 * 3600000;\n  const t = Date.parse(String(v ?? ''));\n  return Number.isNaN(t) ? null : t;\n}\nfunction lamaMenunggu(ms) {\n  const jam = Math.floor(ms / 3600000);\n  return jam < 48 ? `${jam} jam` : `${Math.floor(jam / 24)} hari`;\n}\nconst sekarang = Date.now();\nconst prospekGagal = barisProspek.some(b => b && b.error);\nconst prospek = prospekGagal ? [] : barisProspek\n  .filter(b => b && b['Nomor WA'] && bukanArsip(b['Nomor WA']))\n  .map(b => {\n    const nomor = nomorRapi(b['Nomor WA']);\n    let status = String(b.Status ?? '').trim();\n    const baruTerkonfirmasi = ['Tanya-tanya', 'Menunggu Konfirmasi'].includes(status) && sudahBooking.has(nomor);\n    if (baruTerkonfirmasi) status = 'Terkonfirmasi';\n    return {\n      nomor, status, baruTerkonfirmasi,\n      nama: String(b.Nama ?? '').trim(),\n      perawatan: String(b.Perawatan ?? '').trim(),\n      waktuDiminta: String(b['Waktu Diminta'] ?? '').trim(),\n      pesan: String(b['Pesan Terakhir'] ?? '').trim(),\n      diteruskan: waktuDari(b['Diteruskan Pada']),\n      terakhir: waktuDari(b['Terakhir Chat']),\n    };\n  });\nconst menungguKonfirmasi = prospek.filter(p => p.status === 'Menunggu Konfirmasi');\nconst menggantung = menungguKonfirmasi\n  .filter(p => p.diteruskan && sekarang - p.diteruskan > 24 * 3600000)\n  .sort((a, b) => a.diteruskan - b.diteruskan);\nconst baruTerkonfirmasi = prospek.filter(p => p.baruTerkonfirmasi).length;\nconst batalPekanIni = prospek.filter(p => p.status === 'Batal' && p.terakhir && sekarang - p.terakhir <= 7 * 86400000).length;\n\n// ---- Waktu tunggu pasien ke admin (dari catatan chat 8 hari terakhir) ----\n// Untuk tiap penyerahan ke admin, dicari pesan \"menagih\" pertama dari pasien sebelum penyerahan berikutnya.\nconst logGagal = barisLog.some(b => b && b.error);\nconst logChat = barisLog.filter(b => b && b.id && b.waktu && b.nomor && bukanArsip(b.nomor)).sort((a, b) => a.id - b.id);\nfunction statistikTunggu(jamMundur) {\n  const batas = sekarang - jamMundur * 3600000;\n  const perNomor = {};\n  for (const b of logChat) (perNomor[b.nomor] = perNomor[b.nomor] || []).push(b);\n  let diserahkan = 0;\n  const menit = [];\n  for (const baris of Object.values(perNomor)) {\n    baris.forEach((b, i) => {\n      if (b.tindakan !== 'teruskan' || b.arah === 'masuk') return;\n      const t = Date.parse(b.waktu);\n      if (t < batas) return;\n      diserahkan++;\n      for (const s of baris.slice(i + 1)) {\n        if (s.tindakan === 'teruskan' && s.arah !== 'masuk') break;\n        if (s.topik === 'menagih') { menit.push((Date.parse(s.waktu) - t) / 60000); break; }\n      }\n    });\n  }\n  menit.sort((a, b) => a - b);\n  const median = menit.length ? (menit.length % 2 ? menit[(menit.length - 1) / 2] : (menit[menit.length / 2 - 1] + menit[menit.length / 2]) / 2) : null;\n  return { diserahkan, menagih: menit.length, median, tercepat: menit.length ? menit[0] : null };\n}\nfunction teksMenit(m) {\n  const n = Math.round(m);\n  return n < 60 ? `${n} menit` : `${Math.floor(n / 60)} jam ${n % 60} menit`;\n}\nfunction barisTunggu(label, s) {\n  if (!s.diserahkan) return `- ${label}: belum ada chat yang diserahkan ke admin`;\n  const dasar = `- ${label}: ${s.diserahkan} kali diserahkan ke admin, ${s.menagih} pasien mulai tidak sabar`;\n  if (!s.menagih) return dasar;\n  return `${dasar} (median ${teksMenit(s.median)}, tercepat ${teksMenit(s.tercepat)} setelah diserahkan)`;\n}\n\nconst tgl = new Intl.DateTimeFormat('id-ID', {\n  timeZone: 'Asia/Jakarta', weekday: 'long', day: 'numeric', month: 'long',\n}).format(new Date());\n\nconst L = [];\nL.push(`*Laporan chat ${cfg.nama_klinik}*`);\nL.push(`${tgl}, ${cfg.jam_laporan_mundur} jam terakhir`);\nL.push('');\nif (orang.length === 0) {\n  L.push('Tidak ada chat masuk dalam periode ini.');\n  L.push('');\n} else {\n  L.push(`*Yang chat: ${orang.length} orang*`);\n  L.push(`- Orang baru: ${baru.length} (dari iklan ${iklan.length}, bukan iklan ${bukanIklan.length})`);\n  L.push(`- Pasien lama: ${lama.length}`);\n  L.push(`- Chat di luar jam buka: ${orang.filter(o => o.luar_jam).length} orang`);\n  L.push('');\n  L.push(`*Yang sudah booking: ${baru.filter(jadi).length} dari ${baru.length} orang baru*`);\n  L.push(`- Dari iklan: ${iklan.filter(jadi).length} dari ${iklan.length}${persen(iklan.filter(jadi).length, iklan.length)}`);\n  L.push(`- Bukan iklan: ${bukanIklan.filter(jadi).length} dari ${bukanIklan.length}`);\n  L.push('');\n  if (urutTahap.length) {\n    L.push('*Yang belum booking, berhentinya di mana*');\n    for (const [t, n] of urutTahap) L.push(`- ${t}: ${n}`);\n    L.push('');\n  }\n  if (menunggu.length) {\n    L.push(`*Diserahkan ke admin, perlu dicek: ${menunggu.length} orang*`);\n    for (const o of menunggu.slice(0, 8)) L.push(`- ${o.nama || 'tanpa nama'} (${o.nomor})`);\n    if (menunggu.length > 8) L.push(`- dan ${menunggu.length - 8} lainnya`);\n    L.push('');\n  }\n  if (topik.length) {\n    L.push('*Pertanyaan terbanyak*');\n    topik.forEach(([t, n], i) => L.push(`${i + 1}. ${namaTopik[t] || t}: ${n}`));\n    L.push('');\n  }\n}\n\n// Bagian ini selalu muncul, karena booking yang menggantung tetap penting walau hari ini sepi chat.\nif (prospekGagal) {\n  L.push('_Sheet Prospek & Booking tidak terbaca malam ini, bagian status booking dilewati._');\n  L.push('');\n} else {\n  L.push('*Status booking (sheet Prospek & Booking)*');\n  L.push(`- Menunggu konfirmasi admin: ${menungguKonfirmasi.length} orang, ${menggantung.length} di antaranya lewat 24 jam`);\n  L.push(`- Baru terkonfirmasi sejak laporan terakhir: ${baruTerkonfirmasi} orang`);\n  L.push(`- Batal (chat terakhir dalam 7 hari): ${batalPekanIni} orang`);\n  L.push('');\n  if (menggantung.length) {\n    L.push(`*Booking menggantung lebih dari 24 jam: ${menggantung.length} orang*`);\n    menggantung.slice(0, 8).forEach((p, i) => {\n      const rinci = [p.perawatan || 'perawatan belum disebut', p.waktuDiminta ? `minta ${p.waktuDiminta}` : ''].filter(Boolean).join(', ');\n      L.push(`${i + 1}. ${p.nama || 'tanpa nama'} (${p.nomor}): ${rinci}. Menunggu ${lamaMenunggu(sekarang - p.diteruskan)}.`);\n      if (p.pesan) L.push(`   Pesan terakhir: \"${p.pesan.slice(0, 120)}\"`);\n    });\n    if (menggantung.length > 8) L.push(`- dan ${menggantung.length - 8} lainnya`);\n    L.push('');\n  }\n}\n\nif (logGagal) {\n  L.push('_Catatan chat tidak terbaca malam ini, bagian waktu tunggu ke admin dilewati._');\n  L.push('');\n} else {\n  L.push('*Waktu tunggu pasien ke admin*');\n  L.push(barisTunggu('24 jam terakhir', statistikTunggu(24)));\n  L.push(barisTunggu('7 hari terakhir', statistikTunggu(24 * 7)));\n  L.push('');\n}\n\nL.push('*Iklan sejak sistem dipasang*');\nL.push(`- ${iklanSemua.length} orang chat dari iklan, ${iklanSemuaJadi.length} sudah booking${persen(iklanSemuaJadi.length, iklanSemua.length)}`);\nL.push('');\nL.push(`Balasan otomatis bulan ini: ${r.balasan_bot_bulan_ini ?? 0} dari batas ${cfg.batas_balasan_per_bulan}.`);\nL.push('');\nL.push('_Catatan: booking dihitung dari sheet Booking, jadi pasien yang datang langsung tanpa booking tidak terhitung. Sistem contoh ini belum bisa melihat balasan admin, jadi daftar \"perlu dicek\" belum tentu belum dibalas._');\n\nreturn [{ json: { target: String(cfg.nomor_owner ?? '').replace(/\\D/g, ''), message: L.join('\\n') } }];\n"
+      }
+    },
+    {
+      "id": "dc0e0cdb-1fe2-46fe-9a9c-61059950e9c9",
+      "name": "Kirim Laporan",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1408,
+        320
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.fonnte.com/send",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "target",
+              "value": "={{ $json.target }}"
+            },
+            {
+              "name": "message",
+              "value": "={{ $json.message }}"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "4c1f2a17-9b93-4207-a893-1e33835e045c",
+      "name": "Baca Prospek",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        960,
+        320
+      ],
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Pengaturan').first().json.id_sheet_prospek }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Prospek"
+        },
+        "options": {
+          "outputFormatting": {
+            "values": {
+              "general": "UNFORMATTED_VALUE",
+              "date": "SERIAL_NUMBER"
+            }
+          }
+        }
+      },
+      "executeOnce": true,
+      "onError": "continueRegularOutput",
+      "alwaysOutputData": true
+    },
+    {
+      "id": "62f1876b-7d78-4397-a8ab-2ea155042bd9",
+      "name": "Siapkan Terkonfirmasi",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1184,
+        528
+      ],
+      "parameters": {
+        "jsCode": "// Prospek yang nomornya sudah tercatat di sheet Booking dianggap Terkonfirmasi.\n// Hanya status Tanya-tanya dan Menunggu Konfirmasi yang diubah. Batal tidak disentuh.\nconst baris = $('Baca Prospek').all().map(i => i.json);\nif (baris.some(b => b && b.error)) return [];\nconst barisBooking = $('Baca Booking').all().map(i => i.json);\n\nfunction nomorRapi(n) {\n  let d = String(n ?? '').replace(/\\D/g, '');\n  if (d.startsWith('0')) d = '62' + d.slice(1);\n  else if (d.startsWith('8')) d = '62' + d;\n  return d;\n}\nconst kolomNomor = /(nomor|no\\.?)\\s*(hp|wa|telp|telepon|whatsapp)|^hp$|^wa$|whatsapp|telepon/i;\nconst sudahBooking = new Set();\nfor (const b of barisBooking) {\n  for (const [k, v] of Object.entries(b)) {\n    if (kolomNomor.test(k) && nomorRapi(v).length >= 9) sudahBooking.add(nomorRapi(v));\n  }\n}\n\nreturn baris\n  .filter(b => b && b['Nomor WA'])\n  .filter(b => ['Tanya-tanya', 'Menunggu Konfirmasi'].includes(String(b.Status ?? '').trim()))\n  .filter(b => sudahBooking.has(nomorRapi(b['Nomor WA'])))\n  .map(b => ({ json: { 'Nomor WA': String(b['Nomor WA']), 'Status': 'Terkonfirmasi' } }));\n"
+      }
+    },
+    {
+      "id": "9fabf3f4-ca00-42cf-b510-6f32b520bab9",
+      "name": "Tandai Terkonfirmasi",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1408,
+        528
+      ],
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Pengaturan').first().json.id_sheet_prospek }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Prospek"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "matchingColumns": [
+            "Nomor WA"
+          ],
+          "schema": [
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Nomor WA",
+              "id": "Nomor WA",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Status",
+              "id": "Status",
+              "required": false,
+              "type": "string"
+            }
+          ],
+          "value": {}
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED",
+          "handlingExtraData": "ignoreIt"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "0eeb2b94-c8e0-40e4-a63c-6f7dd26b3f32",
+      "name": "Ambil Log Chat",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        640,
+        528
+      ],
+      "parameters": {
+        "url": "={{ $('Pengaturan').first().json.supabase_url.replace(/\\/+$/, '') }}/rest/v1/chat_log",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "select",
+              "value": "id,nomor,waktu,arah,tindakan,alasan,topik"
+            },
+            {
+              "name": "waktu",
+              "value": "={{ 'gte.' + new Date(Date.now() - 8 * 86400000).toISOString() }}"
+            },
+            {
+              "name": "arah",
+              "value": "neq.masuk"
+            },
+            {
+              "name": "order",
+              "value": "id.asc"
+            },
+            {
+              "name": "limit",
+              "value": "1000"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "onError": "continueRegularOutput",
+      "alwaysOutputData": true,
+      "notes": "Catatan bot 8 hari terakhir dari chat_log, untuk menghitung waktu tunggu pasien ke admin."
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Tiap Malam": {
+      "main": [
+        [
+          {
+            "node": "Pengaturan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Coba Sekarang": {
+      "main": [
+        [
+          {
+            "node": "Pengaturan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pengaturan": {
+      "main": [
+        [
+          {
+            "node": "Ringkasan Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Susun Laporan": {
+      "main": [
+        [
+          {
+            "node": "Kirim Laporan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Baca Booking": {
+      "main": [
+        [
+          {
+            "node": "Baca Prospek",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Baca Prospek": {
+      "main": [
+        [
+          {
+            "node": "Susun Laporan",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Siapkan Terkonfirmasi",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Siapkan Terkonfirmasi": {
+      "main": [
+        [
+          {
+            "node": "Tandai Terkonfirmasi",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ringkasan Chat": {
+      "main": [
+        [
+          {
+            "node": "Ambil Log Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ambil Log Chat": {
+      "main": [
+        [
+          {
+            "node": "Baca Booking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": []
+}

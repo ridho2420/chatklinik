@@ -1,0 +1,1359 @@
+{
+  "name": "Klinik - Balas Chat",
+  "nodes": [
+    {
+      "id": "1b594cfc-6b78-473e-bc0c-4216a60a1de0",
+      "name": "Catatan 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1616,
+        32
+      ],
+      "parameters": {
+        "content": "## 1. Isi dulu node Pengaturan\nSemua hal yang berbeda tiap klinik ada di sana: nama klinik, jam buka, nomor admin, batas balasan, alamat Supabase, dan ID Google Sheets.\n\nNode lain tidak perlu diubah.",
+        "height": 200,
+        "width": 420,
+        "color": 4
+      }
+    },
+    {
+      "id": "3e74f488-680c-4b85-92c3-5b44afce3b6c",
+      "name": "Catatan 2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "content": "## 2. Jalur AI\nAI hanya membaca data dari empat tab Google Sheets, lalu jawabannya diperiksa di node **Periksa Jawaban**.\n\nHarga yang tidak ada di sheet, saran soal kulit, dan jawaban yang meragukan tidak dikirim ke pasien. Chat itu diteruskan ke admin.",
+        "height": 200,
+        "width": 620,
+        "color": 5
+      }
+    },
+    {
+      "id": "e026879a-01f1-4910-818c-c53d05d33055",
+      "name": "Catatan 3",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        624
+      ],
+      "parameters": {
+        "content": "## 3. Jalur tanpa AI\nPasien lama, foto, pertanyaan kondisi kulit, dan chat yang melewati batas balasan langsung ke sini. Aturannya ada di node **Tentukan Jalur**.",
+        "width": 620,
+        "color": 3
+      }
+    },
+    {
+      "id": "815efe93-6408-4444-a611-2572c1982b75",
+      "name": "Webhook Fonnte",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1568,
+        288
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "YOUR_WEBHOOK_PATH",
+        "options": {}
+      }
+    },
+    {
+      "id": "8c0bae4a-7d57-47e7-9028-d56ddd84504e",
+      "name": "Pengaturan",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1344,
+        288
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e775adf1-1d30-44d5-a064-b0e890d1b18d",
+              "name": "nama_klinik",
+              "type": "string",
+              "value": "Klinik Aura Derma"
+            },
+            {
+              "id": "a567f631-760e-4dd6-a95d-4bccb77c1f0e",
+              "name": "supabase_url",
+              "type": "string",
+              "value": "https://YOUR_PROJECT.supabase.co"
+            },
+            {
+              "id": "f44fca66-a13a-4ad1-a985-33322f7a6fa8",
+              "name": "id_sheet_booking",
+              "type": "string",
+              "value": "YOUR_BOOKING_SHEET_ID"
+            },
+            {
+              "id": "d96a4672-ac76-4e7b-accd-0091327e8d49",
+              "name": "id_sheet_data_klinik",
+              "type": "string",
+              "value": "YOUR_CLINIC_DATA_SHEET_ID"
+            },
+            {
+              "id": "b1c2d3e4-prospek-0001",
+              "name": "id_sheet_prospek",
+              "type": "string",
+              "value": "YOUR_PROSPECT_SHEET_ID"
+            },
+            {
+              "id": "3800fab4-43f1-401c-a9b2-087b54ce5901",
+              "name": "jam_buka",
+              "type": "string",
+              "value": "09:00"
+            },
+            {
+              "id": "c082bd9a-fed2-45d6-a051-edf26a99d98e",
+              "name": "jam_tutup",
+              "type": "string",
+              "value": "20:00"
+            },
+            {
+              "id": "d540673e-1bb0-4c9e-a8f6-4eaa5d624bb2",
+              "name": "nomor_admin",
+              "type": "string",
+              "value": "YOUR_ADMIN_WHATSAPP_NUMBER"
+            },
+            {
+              "id": "f851b2ed-c111-4ff7-ac74-ba816ddb5454",
+              "name": "kalimat_iklan",
+              "type": "string",
+              "value": "Halo, saya mau tanya info promonya"
+            },
+            {
+              "id": "aa59f5b3-14eb-445f-a6e0-01e2fa04159a",
+              "name": "batas_balasan_per_nomor_per_hari",
+              "type": "number",
+              "value": 10
+            },
+            {
+              "id": "0709a7d9-a739-402f-a407-f32373088367",
+              "name": "batas_balasan_per_bulan",
+              "type": "number",
+              "value": 1400
+            },
+            {
+              "id": "fed509f9-6f7e-45ea-a4ae-c9a1cabbd1f1",
+              "name": "jawab_hanya_di_luar_jam",
+              "type": "boolean",
+              "value": false
+            },
+            {
+              "id": "c3d4e5f6-ambilalih-0001",
+              "name": "jeda_ambil_alih_jam",
+              "type": "number",
+              "value": 2
+            },
+            {
+              "id": "d4e5f6a7-menunggu-0001",
+              "name": "jawab_saat_menunggu_admin",
+              "type": "string",
+              "value": "selalu"
+            },
+            {
+              "id": "e5f6a7b8-kilat-0001",
+              "name": "isi_sapaan_kilat",
+              "type": "string",
+              "value": "Di klinik kami tersedia perawatan Facial, Peeling, Laser, dan Microneedling. Kami juga punya konsultasi dokter dan produk skincare. Ada keluhan kulit yang ingin Kakak tanyakan, misalnya jerawat, kusam, atau flek?"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "6d21b2d4-cd7c-43f4-b199-3f1b37f6d7bd",
+      "name": "Rapikan Pesan",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1120,
+        288
+      ],
+      "parameters": {
+        "jsCode": "// Merapikan data dari Fonnte supaya node berikutnya memakai nama field yang sama.\nconst cfg = $('Pengaturan').first().json;\nconst body = $('Webhook Fonnte').first().json.body || {};\n\nfunction nomorRapi(n) {\n  let d = String(n ?? '').replace(/\\D/g, '');\n  if (d.startsWith('0')) d = '62' + d.slice(1);\n  else if (d.startsWith('8')) d = '62' + d;\n  return d;\n}\nfunction polos(t) {\n  return String(t ?? '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();\n}\nfunction keMenit(jam) {\n  const [h, m] = String(jam ?? '').split(/[:.]/).map(Number);\n  return (h || 0) * 60 + (m || 0);\n}\n\nconst pengirimAsli = String(body.sender ?? body.pengirim ?? '');\nconst nomor = nomorRapi(pengirimAsli);\nlet pesan = String(body.message ?? body.pesan ?? '').trim();\nconst nama = String(body.name ?? body.nama ?? '').trim();\n\n// Foto, dokumen, atau pesan suara: bot tidak bisa menilainya, jadi nanti diteruskan ke admin.\nconst adaLampiran = Boolean(body.url || body.filename || body.extension);\nconst media = adaLampiran || /^non-?text message$/i.test(pesan);\nif (/^non-?text message$/i.test(pesan)) pesan = '';\n\nconst dariGrup = body.isgroup === true || body.isgroup === 'true'\n  || /@g\\.us|-/.test(pengirimAsli);\n\nlet abaikan = false;\nlet alasan_abaikan = '';\nif (dariGrup) { abaikan = true; alasan_abaikan = 'pesan grup'; }\nelse if (nomor.length < 9) { abaikan = true; alasan_abaikan = 'nomor pengirim tidak terbaca'; }\nelse if (!pesan && !media) { abaikan = true; alasan_abaikan = 'pesan kosong'; }\n   else if (nomor === nomorRapi(cfg.nomor_admin)) { abaikan = true; alasan_abaikan = 'pesan dari admin'; }\n\n// Jam sekarang menurut WIB, apa pun zona waktu servernya.\nconst jamWib = new Intl.DateTimeFormat('en-GB', {\n  timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit', hour12: false,\n}).format(new Date());\nconst menit = keMenit(jamWib);\nconst luar_jam = menit < keMenit(cfg.jam_buka) || menit >= keMenit(cfg.jam_tutup);\n\n// Chat dari iklan dikenali dari kalimat pembuka yang terisi otomatis.\nconst kalimat = polos(cfg.kalimat_iklan);\nconst dari_iklan = kalimat.length > 0 && polos(pesan).includes(kalimat);\n\nreturn [{\n  json: {\n    nomor, nama, pesan, media,\n           id_pesan: (body.inboxid && String(body.inboxid) !== '0')\n         ? String(body.inboxid)\n         : (body.timestamp ? `${nomor}-${body.timestamp}` : ''),\n    abaikan, alasan_abaikan,\n    jam_wib: jamWib, luar_jam, dari_iklan,\n  },\n}];\n"
+      },
+      "retryOnFail": false
+    },
+    {
+      "id": "286c4a08-d49b-4d9d-b803-e386ebf2ab13",
+      "name": "Pesan layak diproses?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -896,
+        288
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ed1fa6a2-2647-4b91-a683-27a74bf6748b",
+              "leftValue": "={{ $json.abaikan }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "520415b1-c970-4975-a058-b82ad36c9124",
+      "name": "Baca Booking",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -688,
+        288
+      ],
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Pengaturan').first().json.id_sheet_booking }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Booking"
+        },
+        "options": {}
+      },
+      "executeOnce": true,
+      "alwaysOutputData": true
+    },
+    {
+      "id": "847070c3-5627-4db9-a35a-494cef7bc4c3",
+      "name": "Cek Pasien Lama",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -464,
+        288
+      ],
+      "parameters": {
+        "jsCode": "// Pasien lama = nomornya sudah ada di sheet Booking. Mereka langsung ditangani admin.\nconst chat = $('Rapikan Pesan').first().json;\nconst baris = $('Baca Booking').all().map(i => i.json);\n\nfunction nomorRapi(n) {\n  let d = String(n ?? '').replace(/\\D/g, '');\n  if (d.startsWith('0')) d = '62' + d.slice(1);\n  else if (d.startsWith('8')) d = '62' + d;\n  return d;\n}\nconst kolomNomor = /(nomor|no\\.?)\\s*(hp|wa|telp|telepon|whatsapp)|^hp$|^wa$|whatsapp|telepon/i;\nconst kolomNama = /nama/i;\n\nlet pasien_lama = false;\nlet nama_di_sheet = '';\nfor (const b of baris) {\n  for (const [k, v] of Object.entries(b)) {\n    if (!kolomNomor.test(k)) continue;\n    if (nomorRapi(v) === chat.nomor) {\n      pasien_lama = true;\n      const kn = Object.keys(b).find(x => kolomNama.test(x));\n      nama_di_sheet = kn ? String(b[kn] ?? '') : '';\n    }\n  }\n  if (pasien_lama) break;\n}\n\nreturn [{ json: { ...chat, pasien_lama, nama_di_sheet } }];\n"
+      }
+    },
+    {
+      "id": "45ea0fb2-24d8-4db3-9136-399e0b346035",
+      "name": "Catat Chat Masuk",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -240,
+        288
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Pengaturan').first().json.supabase_url.replace(/\\/+$/, '') }}/rest/v1/rpc/catat_masuk",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ p_nomor: $json.nomor, p_nama: $json.nama, p_pesan: $json.pesan || '(lampiran)', p_id_pesan: $json.id_pesan, p_dari_iklan: $json.dari_iklan, p_luar_jam: $json.luar_jam, p_pasien_lama: $json.pasien_lama }) }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "8c807652-e8e2-49cb-8d31-8896d49d8dcd",
+      "name": "Tentukan Jalur",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -16,
+        288
+      ],
+      "parameters": {
+        "jsCode": "// Memutuskan: dijawab AI, diteruskan ke admin, atau bot diam.\nconst cfg = $('Pengaturan').first().json;\nconst chat = { ...$('Cek Pasien Lama').first().json };\nconst status = $('Catat Chat Masuk').first().json;   // hasil dari Supabase\n\n// Pesan yang sama terkirim dua kali dari Fonnte: berhenti di sini.\nif (status.duplikat) return [];\n\nconst namaTampil = chat.nama_di_sheet || chat.nama || 'tanpa nama';\nconst SERAH = 'Mulai dari sini Kakak akan dibalas langsung oleh admin kami, bukan asisten AI.';\nconst SAMBIL = 'Sambil menunggu, kalau ada pertanyaan lain soal harga, jadwal, atau promo, Kakak tetap bisa tanya saya ya.';\n// Saklar di node Pengaturan: apakah bot tetap menjawab pertanyaan lain selama chat menunggu admin?\n//   \"selalu\"   : tetap menjawab kapan saja (dipakai untuk demo)\n//   \"luar_jam\" : tetap menjawab hanya saat klinik tutup; di jam kerja bot diam karena admin sedang memegang chat\n//   \"tidak\"    : bot diam sampai admin selesai (perilaku lama, juga dipakai kalau kolomnya kosong)\nconst modeMenunggu = String(cfg.jawab_saat_menunggu_admin ?? '').trim().toLowerCase();\nconst jawabSaatMenunggu = modeMenunggu === 'selalu' || (modeMenunggu === 'luar_jam' && Boolean(chat.luar_jam));\nfunction penutupSerah() {\n  return jawabSaatMenunggu ? `${kapanDibalas()} ${SAMBIL}` : `${SERAH} ${kapanDibalas()}`;\n}\nfunction kapanDibalas() {\n  if (!chat.luar_jam) return 'Admin kami akan segera membalas Kakak.';\n  // Sebelum jam buka (misalnya jam 06.00) berarti hari ini; sesudah jam tutup berarti besok.\n  const jamKini = new Intl.DateTimeFormat('en-GB', {\n    timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit', hour12: false,\n  }).format(new Date(Date.now()));\n  const hari = keMenit(jamKini) < keMenit(cfg.jam_buka) ? 'hari ini' : 'besok';\n  return `Klinik sedang tutup, admin kami akan membalas Kakak ${hari} mulai pukul ${String(cfg.jam_buka).replace(':', '.')} WIB.`;\n}\nfunction untukAdmin(judul, baris = []) {\n  return [\n    `[${judul}]`,\n    `Dari: ${namaTampil} (${chat.nomor})`,\n    ...baris,\n    `Pesan: \"${chat.pesan || '(lampiran)'}\"`,\n  ].join('\\n');\n}\nfunction selesai(o) {\n  return [{ json: {\n    perlu_ai: false, nomor: chat.nomor, nama: chat.nama,\n    pesan_pasien: '', pesan_admin: '',\n    log: { tindakan: 'diam', alasan: null, topik: null, booking: null },\n    ...o,\n  } }];\n}\nfunction keMenit(jam) {\n  const [h, m] = String(jam ?? '').split(/[:.]/).map(Number);\n  return (h || 0) * 60 + (m || 0);\n}\n// Berapa jam dari rentang waktu a..b yang jatuh di dalam jam buka klinik (WIB).\nfunction jamKerja(a, b) {\n  if (!(b > a)) return 0;\n  const OFF = 7 * 3600000, HARI = 86400000;\n  const buka = keMenit(cfg.jam_buka) * 60000, tutup = keMenit(cfg.jam_tutup) * 60000;\n  let total = 0;\n  for (let h = Math.floor((a + OFF) / HARI); h <= Math.floor((b + OFF) / HARI); h++) {\n    const s = h * HARI - OFF + buka, e = h * HARI - OFF + tutup;\n    total += Math.max(0, Math.min(b, e) - Math.max(a, s));\n  }\n  return total / 3600000;\n}\nfunction tanggalWIB(ms) {\n  return new Date(ms + 7 * 3600000).toISOString().slice(0, 10);\n}\nfunction jamWIB(ms) {\n  return new Date(ms + 7 * 3600000).toISOString().slice(11, 16).replace(':', '.');\n}\n// \"kemarin 19.30\", \"hari ini 10.05\", atau \"01/11 19.30\".\nfunction kapanWIB(ms) {\n  const selisih = (Date.parse(tanggalWIB(sekarang)) - Date.parse(tanggalWIB(ms))) / 86400000;\n  if (selisih === 0) return `hari ini ${jamWIB(ms)}`;\n  if (selisih === 1) return `kemarin ${jamWIB(ms)}`;\n  const t = tanggalWIB(ms);\n  return `${t.slice(8, 10)}/${t.slice(5, 7)} ${jamWIB(ms)}`;\n}\nfunction lamaTunggu(ms) {\n  const menit = Math.max(0, Math.round(ms / 60000));\n  if (menit < 60) return `${menit} menit`;\n  return `${Math.floor(menit / 60)} jam ${menit % 60} menit`;\n}\n// Pesan yang menandakan pasien menunggu balasan, misalnya \"halo?\", \"kak??\", \"kok belum dibalas\".\nfunction menagih(teks) {\n  const p = String(teks ?? '').toLowerCase().trim();\n  if (!p) return false;\n  return [\n    /^(ha+l+o+|hai+|p+|ping|kak+|ka+|min+|admin|permisi|tes|test)[\\s?!.]*$/,\n    /\\?{2,}/,\n    /\\b(kok|koq|ko)\\b.{0,25}\\b(lama|belum|blm|gak|ga|nggak|engga|enggak|tidak|ndak)\\b/,\n    /\\b(belum|blm|blom)\\b.{0,15}\\b(dibalas|dibales|dijawab|direspon|direspons|dibaca|bales|balas|respon|jawab)\\b/,\n    /\\b(lama|lambat)\\s*(banget|bgt|sekali|amat|ya|yah)\\b/,\n    /\\b(masih|udah|sudah|udh)\\s*(nunggu|menunggu)\\b/,\n    /\\b(respon|tanggapi|bales|balas|jawab)\\s*(dong|donk|please|plis|pls|ya)\\b/,\n    /^(jadi|jadinya|terus|trus|gimana|bagaimana)(\\s+(kak|ka|min|ya|nih|dong|jadinya|gimana|nya))*\\s*\\?+\\s*$/,\n    /^jadi(nya)?\\s+(bisa|gimana|kapan|gak|nggak|ga)\\b.{0,15}\\?*\\s*$/,\n    /\\b(ditinggal|dicuekin|dikacangin|diabaikan|gak ada yang bales|ga ada yang bales)\\b/,\n  ].some(r => r.test(p));\n}\n\n// ---- Apakah nomor ini sedang ditangani admin? ----\n// Dihitung dari catatan chat di Supabase (node Cek Ambil Alih). Kalau catatan gagal dibaca,\n// bot berperilaku seperti biasa.\nconst pesanSekarang = chat.pesan || '(lampiran)';\nlet catatanLama = $('Cek Ambil Alih').all().map(i => i.json).filter(r => r && r.id && r.waktu);\ncatatanLama.sort((a, b) => a.id - b.id);\n\n// Sapaan kilat: pesan pertama yang sudah dibalas langsung oleh node Cek Sapaan Kilat\n// tidak ikut digabung lagi dengan bubble berikutnya.\nconst kilatRow = catatanLama.find(r => r.alasan === 'sapaan_kilat' && r.arah !== 'masuk');\nlet idDisapa = null;\nif (kilatRow) {\n  const sebelumKilat = catatanLama.filter(r => r.arah === 'masuk' && r.id < kilatRow.id).map(r => r.id);\n  if (sebelumKilat.length) idDisapa = Math.min(...sebelumKilat);\n}\n\n// ---- Pesan beruntun (banyak bubble) ----\n// Workflow menunggu dulu (node \"Tunggu Pasien Selesai\") sebelum sampai di sini.\n// Kalau ada pesan pasien lain yang tercatat paling lama TUNGGU_DETIK sesudah pesan ini, pesan ini tidak dibalas\n// sendiri: ia ikut dibalas bersama pesan terbaru itu. Aturan \"tunggu\" dan aturan \"gabung\" memakai batas yang\n// sama dan jam pencatatan yang sama (Supabase), jadi setiap bubble dijawab tepat sekali.\nconst TUNGGU_DETIK = 5;   // samakan dengan node \"Tunggu Pasien Selesai\"\nlet iIni = -1;\nif (chat.id_pesan) {\n  for (let i = catatanLama.length - 1; i >= 0; i--) {\n    if (catatanLama[i].arah === 'masuk' && catatanLama[i].id_pesan === chat.id_pesan) { iIni = i; break; }\n  }\n}\nif (iIni === -1) {\n  for (let i = catatanLama.length - 1; i >= 0; i--) {\n    if (catatanLama[i].arah === 'masuk' && catatanLama[i].pesan === pesanSekarang) { iIni = i; break; }\n  }\n}\nlet bubble = [];\nif (iIni !== -1) {\n  const tIni = Date.parse(catatanLama[iIni].waktu);\n  if (catatanLama.slice(iIni + 1).some(r => r.arah === 'masuk' && Date.parse(r.waktu) - tIni <= TUNGGU_DETIK * 1000)) return [];\n  // Bubble sebelumnya ikut digabung kalau dikirim beruntun dan belum dijawab.\n  let awal = iIni;\n  while (awal > 0) {\n    const sebelum = catatanLama[awal - 1];\n    if (sebelum.arah !== 'masuk') break;\n    if (sebelum.id === idDisapa) break;\n    if (Date.parse(catatanLama[awal].waktu) - Date.parse(sebelum.waktu) > TUNGGU_DETIK * 1000) break;\n    awal--;\n  }\n  bubble = catatanLama.slice(awal, iIni + 1);\n  // Buang baris pesan yang sedang diproses (sudah dicatat oleh Catat Chat Masuk).\n  catatanLama.splice(awal, bubble.length);\n}\nconst semuaPesan = bubble.length ? bubble.map(r => r.pesan || '(lampiran)') : [pesanSekarang];\nlet riwayatChat = status.riwayat || [];\nif (semuaPesan.length > 1) {\n  chat.pesan = semuaPesan.filter(t => t !== '(lampiran)').join('\\n');\n  if (semuaPesan.includes('(lampiran)')) chat.media = true;\n  if (bubble.some(r => r.dari_iklan === true)) chat.dari_iklan = true;\n  // Riwayat dari Supabase sudah memuat bubble sebelumnya; buang supaya tidak terhitung dua kali.\n  let buang = semuaPesan.length - 1;\n  while (buang > 0 && riwayatChat.length && riwayatChat[riwayatChat.length - 1].arah === 'masuk') {\n    riwayatChat = riwayatChat.slice(0, -1);\n    buang--;\n  }\n}\n// Balasan sapaan kilat bisa belum masuk riwayat kalau bubble berikutnya dikirim cepat.\n// Ditambahkan supaya bot tidak memperkenalkan diri dua kali.\nif (kilatRow && kilatRow.pesan && riwayatChat.length <= 3\n    && !riwayatChat.some(r => r.arah !== 'masuk' && r.pesan === kilatRow.pesan)) {\n  riwayatChat = [...riwayatChat];\n  const i = riwayatChat.findIndex(r => r.arah === 'masuk');\n  riwayatChat.splice(i === -1 ? 0 : i + 1, 0, { arah: 'keluar', pesan: kilatRow.pesan });\n}\nconst sekarang = Date.now();\nconst jeda = Number(cfg.jeda_ambil_alih_jam) > 0 ? Number(cfg.jeda_ambil_alih_jam) : 2;\nlet ambilAlih = null;      // diisi kalau nomor ini sedang ditangani admin\nlet kembaliAktif = false;  // true kalau bot baru aktif lagi setelah admin menangani\nlet iSerah = -1;\nfor (let i = catatanLama.length - 1; i >= 0; i--) {\n  if (catatanLama[i].tindakan === 'teruskan' && catatanLama[i].arah !== 'masuk') { iSerah = i; break; }\n}\nif (iSerah >= 0) {\n  const serah = catatanLama[iSerah];\n  const tSerah = Date.parse(serah.waktu);\n  const sesudah = catatanLama.slice(iSerah + 1);\n  // Kalau bot sudah pernah menjawab lagi sesudah penyerahan, masa ditangani admin sudah selesai.\n  // (Jawaban bot untuk pertanyaan lain selama menunggu admin, alasan \"menunggu_admin\", tidak dihitung.)\n  const menungguSaja = r => r.tindakan === 'jawab' && r.alasan === 'menunggu_admin';\n  if (!sesudah.some(r => r.tindakan === 'jawab' && !menungguSaja(r))) {\n    const waktuPasien = sesudah.filter(r => r.arah === 'masuk').map(r => Date.parse(r.waktu));\n    const terakhirAktif = Math.max(tSerah, ...waktuPasien);\n    if (jamKerja(terakhirAktif, sekarang) < jeda) {\n      ambilAlih = {\n        sejak: tSerah,\n        alasan: serah.alasan,\n        sudahDiingatkan: sesudah.some(r => r.tindakan === 'pengingat'),\n        // Sudah dikabari hari ini (WIB)? Dipakai untuk sapaan pertama di hari baru.\n        dikabariHariIni: sesudah.some(r => (r.tindakan === 'pengingat' || menungguSaja(r))\n          && tanggalWIB(Date.parse(r.waktu)) === tanggalWIB(sekarang)),\n        hariBaru: tanggalWIB(tSerah) !== tanggalWIB(sekarang),\n      };\n    } else {\n      kembaliAktif = true;\n    }\n  }\n}\nconst riwayatAda = riwayatChat.length > 0;\nconst sapaNama = chat.nama ? `Kak ${String(chat.nama).split(' ')[0]}` : 'Kak';\nfunction sapaKembali(teks) {\n  if (!kembaliAktif || !riwayatAda || /(saya|ini) asisten (AI|otomatis)/i.test(teks)) return teks;\n  return `Halo Kak, ini asisten AI ${cfg.nama_klinik} lagi. ` + teks;\n}\n\n// 1. Pasien lama: bot tidak menjawab, admin diberi tahu.\nif (chat.pasien_lama) {\n  return selesai({\n    pesan_admin: untukAdmin('Pasien lama, tidak dijawab otomatis'),\n    log: { tindakan: 'diam', alasan: 'pasien_lama', topik: null, booking: null },\n  });\n}\n\n// 2. Sedang ditangani admin: bot tidak ikut menjawab soal yang sudah diserahkan.\n//    a. Pesan pertama pasien di hari baru: selalu dikabari SATU kali hari itu, admin diingatkan.\n//    b. Kalau pasien menagih, dikabari SATU kali, admin diingatkan.\n//    c. Pertanyaan lain: dijawab AI kalau saklar jawab_saat_menunggu_admin mengizinkan; selain itu bot diam.\nlet menungguAdmin = null;   // diisi kalau bot tetap menjawab pertanyaan lain selama menunggu admin\nif (ambilAlih) {\n  const tagih = semuaPesan.some(menagih);\n  const namaAlasan = {\n    booking: 'permintaan booking', kondisi_kulit: 'pertanyaan kondisi kulit',\n    harga_tidak_ada: 'harga tidak ada di daftar', minta_admin: 'minta bicara dengan admin',\n    komplain: 'komplain', kirim_media: 'kiriman foto atau berkas', lainnya: 'pertanyaan lain',\n  };\n  const soal = namaAlasan[ambilAlih.alasan] || 'diteruskan ke admin';\n  const ingatkanAdmin = () => untukAdmin('Pasien chat lagi hari ini, mohon segera dibalas', [\n    `Diserahkan sejak: ${kapanWIB(ambilAlih.sejak)} (${soal})`,\n    `Sudah menunggu: ${lamaTunggu(sekarang - ambilAlih.sejak)}`,\n  ]);\n  const perluDiingatkan = ambilAlih.hariBaru && !ambilAlih.dikabariHariIni;\n  if (jawabSaatMenunggu && !tagih) {\n    if (chat.media) {\n      return selesai({\n        pesan_pasien: `Terima kasih, Kak, kirimannya sudah masuk dan akan dilihat langsung oleh admin kami. ${kapanDibalas()}`,\n        pesan_admin: untukAdmin('Pasien mengirim foto atau berkas (chat ini sedang menunggu admin)', [\n          `Diserahkan sejak: ${kapanWIB(ambilAlih.sejak)} (${soal})`,\n        ]),\n        log: { tindakan: 'jawab', alasan: 'menunggu_admin', topik: 'kondisi_kulit', booking: null },\n      });\n    }\n    // Lanjut ke langkah 3–7 di bawah, ditandai \"menunggu admin\".\n    menungguAdmin = { soal, admin_tambahan: perluDiingatkan ? ingatkanAdmin() : '' };\n  } else {\n    if (perluDiingatkan) {\n      const jam = chat.luar_jam\n        ? `Admin kami mulai membalas pukul ${String(cfg.jam_buka).replace(':', '.')} WIB ya.`\n        : 'Admin sudah kami ingatkan, Kakak akan segera dibalas.';\n      return selesai({\n        pesan_pasien: `Halo Kak, ini asisten AI ${cfg.nama_klinik}. Pesan Kakak sudah kami teruskan ke admin. ${jam}`,\n        pesan_admin: ingatkanAdmin(),\n        log: { tindakan: 'pengingat', alasan: 'hari_baru', topik: tagih ? 'menagih' : null, booking: null },\n      });\n    }\n    if (tagih && !ambilAlih.sudahDiingatkan) {\n      return selesai({\n        pesan_pasien: `Mohon maaf membuat Kakak menunggu. Ini asisten AI ${cfg.nama_klinik}: pesan Kakak sudah ada di admin kami dan akan dibalas langsung oleh admin. ${kapanDibalas()}`,\n        pesan_admin: untukAdmin('Pasien menagih, mohon segera dibalas', [\n          `Sudah menunggu: ${lamaTunggu(sekarang - ambilAlih.sejak)} sejak diserahkan (${soal})`,\n        ]),\n        log: { tindakan: 'pengingat', alasan: 'menagih', topik: 'menagih', booking: null },\n      });\n    }\n    return selesai({\n      log: { tindakan: 'diam', alasan: 'ditangani_admin', topik: tagih ? 'menagih' : null, booking: null },\n    });\n  }\n}\n\n// 3. Foto atau berkas: bot tidak menilai, langsung ke admin.\nif (chat.media) {\n  return selesai({\n    pesan_pasien: !riwayatAda\n      ? `Halo ${sapaNama}, saya asisten AI ${cfg.nama_klinik}. Terima kasih, kirimannya sudah masuk. Saya tidak bisa menilai foto atau berkas, `\n        + 'jadi saya teruskan ke admin kami ya. ' + penutupSerah()\n      : sapaKembali('Terima kasih, Kak, kirimannya sudah masuk. Saya asisten AI, jadi tidak bisa menilai foto atau berkas. '\n        + 'Saya teruskan ke admin kami ya. ' + penutupSerah()),\n    pesan_admin: untukAdmin('Perlu ditangani: pasien mengirim foto atau berkas'),\n    log: { tindakan: 'teruskan', alasan: 'kirim_media', topik: 'kondisi_kulit', booking: null },\n  });\n}\n\n// 4. Batas biaya. Kalau tercapai, bot diam dan chat kembali ke admin.\nif (Number(status.balasan_bot_bulan_ini) >= Number(cfg.batas_balasan_per_bulan)) {\n  return selesai({\n    pesan_admin: untukAdmin('Batas balasan bulanan tercapai, mohon dibalas manual'),\n    log: { tindakan: 'diam', alasan: 'batas_bulanan', topik: null, booking: null },\n  });\n}\nif (Number(status.balasan_bot_hari_ini) >= Number(cfg.batas_balasan_per_nomor_per_hari)) {\n  return selesai({\n    pesan_admin: untukAdmin('Nomor ini sudah banyak dibalas otomatis hari ini, mohon dilanjutkan manual'),\n    log: { tindakan: 'diam', alasan: 'batas_harian', topik: null, booking: null },\n  });\n}\n\n// 5. Mode hemat: bot hanya bekerja saat klinik tutup.\nif (cfg.jawab_hanya_di_luar_jam === true && !chat.luar_jam) {\n  return selesai({\n    log: { tindakan: 'diam', alasan: 'jam_kerja', topik: null, booking: null },\n  });\n}\n\n// 6. Kondisi kulit yang serius atau hal medis: langsung ke orang, tanpa bertanya ke AI.\n//    Keluhan kulit biasa (jerawat, kusam, flek, \"cocoknya apa\") tetap dijawab AI dari data klinik,\n//    lalu AI menawarkan untuk meneruskan ke tim klinik.\nconst p = chat.pesan.toLowerCase();\nconst soalKulit = [\n  /\\b(hamil|menyusui|alergi|iritasi|perih|bengkak|bernanah|nanah|meradang|radang|berdarah|infeksi|ruam|efek samping)\\b/,\n  /\\b(obat|salep)\\b.{0,20}\\b(apa|yang mana|bagus)\\b/,\n].some(r => r.test(p));\n\nif (soalKulit) {\n  return selesai({\n    pesan_pasien: !riwayatAda\n      ? `Halo ${sapaNama}, saya asisten AI ${cfg.nama_klinik}. Untuk kondisi kulit, saya tidak memberi saran supaya tidak keliru. `\n        + 'Pertanyaan Kakak saya teruskan ke admin kami agar dijawab langsung oleh tim klinik. ' + penutupSerah()\n      : sapaKembali('Untuk kondisi kulit, saya tidak memberi saran supaya tidak keliru. '\n        + 'Pertanyaan Kakak saya teruskan ke admin kami agar dijawab langsung oleh tim klinik. ' + penutupSerah()),\n    pesan_admin: untukAdmin('Perlu ditangani: pertanyaan kondisi kulit'),\n    log: { tindakan: 'teruskan', alasan: 'kondisi_kulit', topik: 'kondisi_kulit', booking: null },\n  });\n}\n\n// 7. Selain itu: dijawab AI dari data klinik.\nreturn [{ json: {\n  perlu_ai: true, nomor: chat.nomor, nama: chat.nama, pesan: chat.pesan,\n  luar_jam: chat.luar_jam, dari_iklan: chat.dari_iklan,\n  riwayat: riwayatChat,\n  kembali_aktif: kembaliAktif,\n  // Diisi kalau chat ini sedang menunggu admin dan bot tetap menjawab pertanyaan lain.\n  menunggu_admin: Boolean(menungguAdmin),\n  soal_menunggu: menungguAdmin ? menungguAdmin.soal : '',\n  kapan_dibalas: menungguAdmin ? kapanDibalas() : '',\n  admin_tambahan: menungguAdmin ? menungguAdmin.admin_tambahan : '',\n} }];\n"
+      }
+    },
+    {
+      "id": "0ca59056-d7bb-488f-a0d3-f53e6295bed7",
+      "name": "Perlu dijawab AI?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        288
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d4d1d4d5-7259-4a28-a35e-654c98e42e5e",
+              "leftValue": "={{ $json.perlu_ai }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "ecb2d7b3-8985-4493-920e-7430c649c9f3",
+      "name": "Baca Harga",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        432,
+        240
+      ],
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Pengaturan').first().json.id_sheet_data_klinik }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Harga"
+        },
+        "options": {}
+      },
+      "executeOnce": true,
+      "alwaysOutputData": true
+    },
+    {
+      "id": "5e84e64b-2e14-4de8-90ac-190ea1f3b4c6",
+      "name": "Baca Jadwal",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        640,
+        240
+      ],
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Pengaturan').first().json.id_sheet_data_klinik }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Jadwal"
+        },
+        "options": {}
+      },
+      "executeOnce": true,
+      "alwaysOutputData": true
+    },
+    {
+      "id": "7aec35fa-935a-4744-8179-836424355aef",
+      "name": "Baca Promo",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        864,
+        240
+      ],
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Pengaturan').first().json.id_sheet_data_klinik }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Promo"
+        },
+        "options": {}
+      },
+      "executeOnce": true,
+      "alwaysOutputData": true
+    },
+    {
+      "id": "4db3b8ab-0d3b-45c1-858d-c6a4b3fe6e81",
+      "name": "Baca Info",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1088,
+        240
+      ],
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Pengaturan').first().json.id_sheet_data_klinik }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Info"
+        },
+        "options": {}
+      },
+      "executeOnce": true,
+      "alwaysOutputData": true
+    },
+    {
+      "id": "09c9cfc8-afa9-448d-8427-6d9034594f75",
+      "name": "Susun Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1312,
+        240
+      ],
+      "parameters": {
+        "jsCode": "// Menyusun bahan untuk AI: aturan, data klinik dari Google Sheets, dan riwayat chat.\nconst cfg = $('Pengaturan').first().json;\nconst chat = $('Tentukan Jalur').first().json;\n\nfunction rupiah(n) {\n  return 'Rp ' + Math.round(n).toLocaleString('id-ID').replace(/,/g, '.');\n}\n// Mengambil semua nominal uang dari sebuah teks, misalnya \"Rp 250.000\" atau \"150 ribu\".\nfunction nominalDari(teks) {\n  const hasil = [];\n  const t = String(teks ?? '').toLowerCase();\n  const pola = /(\\brp\\.?\\s*)?(\\d{1,3}(?:\\.\\d{3})+|\\d+(?:[.,]\\d+)?)(\\s*(ribu|rb|k|juta|jt)\\b)?/g;\n  let m;\n  while ((m = pola.exec(t)) !== null) {\n    const adaRp = Boolean(m[1]);\n    const satuan = m[4];\n    const ribuan = /^\\d{1,3}(\\.\\d{3})+$/.test(m[2]);\n    if (!adaRp && !satuan && !ribuan) continue;        // angka biasa, misalnya jam atau tanggal\n    let n = ribuan ? Number(m[2].replace(/\\./g, '')) : Number(m[2].replace(',', '.'));\n    if (satuan === 'ribu' || satuan === 'rb' || satuan === 'k') n *= 1000;\n    if (satuan === 'juta' || satuan === 'jt') n *= 1000000;\n    if (Number.isFinite(n) && n >= 1000) hasil.push(Math.round(n));\n  }\n  return hasil;\n}\n\nconst kolomUang = /harga|biaya|tarif|dp|deposit/i;\nconst diizinkan = new Set();\n\n// Tanggal hari ini (WIB), dipakai untuk menyaring promo yang sudah lewat.\nconst hariIni = new Date(Date.now() + 7 * 3600000).toISOString().slice(0, 10);\nconst BULAN = { januari: 1, jan: 1, februari: 2, feb: 2, maret: 3, mar: 3, april: 4, apr: 4, mei: 5,\n  juni: 6, jun: 6, juli: 7, jul: 7, agustus: 8, agu: 8, agt: 8, ags: 8, september: 9, sep: 9, sept: 9,\n  oktober: 10, okt: 10, november: 11, nov: 11, desember: 12, des: 12 };\n// Mengubah \"31 Oktober 2026\", \"31/10/2026\", \"2026-10-31\", atau angka seri Sheets menjadi \"2026-10-31\".\nfunction keTanggal(v) {\n  if (typeof v === 'number' && v > 20000) return new Date((v - 25569) * 86400000).toISOString().slice(0, 10);\n  const t = String(v ?? '').trim().toLowerCase();\n  const dua = n => String(n).padStart(2, '0');\n  let m = t.match(/^(\\d{4})-(\\d{1,2})-(\\d{1,2})/);\n  if (m) return `${m[1]}-${dua(m[2])}-${dua(m[3])}`;\n  m = t.match(/^(\\d{1,2})[\\/.-](\\d{1,2})[\\/.-](\\d{4})/);\n  if (m) return `${m[3]}-${dua(m[2])}-${dua(m[1])}`;\n  m = t.match(/(\\d{1,2})\\s+([a-z]+)\\s+(\\d{4})/);\n  if (m && BULAN[m[2]]) return `${m[3]}-${dua(BULAN[m[2]])}-${dua(m[1])}`;\n  return null;\n}\nconst kolomBerakhir = /berlaku|sampai|hingga|berakhir|batas/i;\nfunction sudahLewat(b) {\n  for (const [k, v] of Object.entries(b)) {\n    if (!kolomBerakhir.test(k)) continue;\n    const tgl = keTanggal(v);\n    if (tgl && tgl < hariIni) return true;\n  }\n  return false;\n}\nconst tanggalTampil = new Intl.DateTimeFormat('id-ID', {\n  timeZone: 'Asia/Jakarta', weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',\n}).format(new Date());\n\n// Data klinik diambil dari salinan (data table \"Salinan Data Klinik\", diperbarui tiap 30 menit).\n// Kalau salinan kosong atau terlalu lama, workflow membaca Google Sheets langsung (node Baca Harga dan seterusnya).\nconst salinan = $('Data Klinik').first().json;\nfunction barisTab(tab, namaNode) {\n  if (salinan.ada) return Array.isArray(salinan[tab]) ? salinan[tab] : [];\n  return $(namaNode).all().map(i => i.json);\n}\n\nfunction isiTab(baris, saringLewat = false) {\n  const teks = [];\n  for (const b of baris) {\n    if (!b || typeof b !== 'object') continue;\n    if (saringLewat && sudahLewat(b)) continue;   // promo yang sudah lewat tidak dikirim ke AI\n    const bagian = [];\n    for (const [k, v] of Object.entries(b)) {\n      if (k === 'row_number' || v === '' || v === null || v === undefined) continue;\n      if (typeof v === 'number' && kolomUang.test(k)) {\n        diizinkan.add(Math.round(v));\n        bagian.push(`${k}: ${rupiah(v)}`);\n      } else {\n        for (const n of nominalDari(v)) diizinkan.add(n);\n        if (kolomUang.test(k) && /^\\d+$/.test(String(v).trim())) {\n          diizinkan.add(Number(v));\n          bagian.push(`${k}: ${rupiah(Number(v))}`);\n        } else {\n          bagian.push(`${k}: ${String(v).trim()}`);\n        }\n      }\n    }\n    if (bagian.length) teks.push('- ' + bagian.join(' | '));\n  }\n  return teks.length ? teks.join('\\n') : '(kosong)';\n}\n\nconst harga = isiTab(barisTab('harga', 'Baca Harga'));\nconst jadwal = isiTab(barisTab('jadwal', 'Baca Jadwal'));\nconst promo = isiTab(barisTab('promo', 'Baca Promo'), true);\nconst info = isiTab(barisTab('info', 'Baca Info'));\n\nconst riwayat = (chat.riwayat || []).map(r =>\n  `${r.arah === 'masuk' ? 'Pasien' : 'Asisten'}: ${r.pesan}`).join('\\n') || '(belum ada, ini pesan pertama)';\n\n// Chat yang sedang menunggu admin, tapi bot tetap boleh menjawab pertanyaan lain (saklar jawab_saat_menunggu_admin).\nconst bagianMenunggu = chat.menunggu_admin ? `\n\nSEDANG MENUNGGU ADMIN\nSebelumnya chat ini sudah diteruskan ke admin (${chat.soal_menunggu}). ${chat.kapan_dibalas}\nAdmin hanya menangani hal yang sudah diteruskan itu. Bagian ini menggantikan tawaran ke tim klinik di aturan 2, 3, 6, dan 11:\na. Pertanyaan baru yang jawabannya ada di DATA KLINIK (harga, promo, jadwal dokter, jam buka, alamat, perawatan, produk, cara booking, pembayaran, parkir, dan info umum lain) WAJIB kamu jawab sendiri sekarang, lengkap dan persis seperti biasa. Jangan bilang admin yang akan menjawabnya dan jangan menunda jawabannya. Contoh: pasien bertanya promo, sebutkan promo yang ada di DATA KLINIK.\nb. Jangan menawarkan untuk meneruskan ke tim klinik lagi. Hanya kalau jawabannya benar-benar tidak ada di DATA KLINIK, katakan dengan jujur bahwa admin kami akan menjawabnya sekalian saat membalas nanti.\nc. Hanya kalau pasien menanyakan kelanjutan hal yang sudah diteruskan tadi, sampaikan bahwa admin kami sedang menanganinya dan kapan admin membalas.\nd. Tidak perlu mengingatkan bahwa admin akan membalas kalau pasien tidak menanyakannya.\ne. Booking yang datanya sudah lengkap, komplain, dan kondisi kulit yang serius tetap memakai tindakan \"teruskan\".` : '';\n\nconst prompt = `Kamu adalah asisten AI ${cfg.nama_klinik} yang membalas chat WhatsApp calon pasien.\nHari ini: ${tanggalTampil}.\nJam buka klinik: ${cfg.jam_buka} sampai ${cfg.jam_tutup} WIB. Sekarang klinik ${chat.luar_jam ? 'sedang TUTUP' : 'sedang BUKA'}.\n\nATURAN\n1. Jawab hanya dari DATA KLINIK di bawah. Jangan menambah, menebak, menghitung, atau membulatkan.\n2. Harga: sebut hanya harga yang tertulis di DATA KLINIK, persis angkanya. Kalau perawatan atau harga yang ditanya tidak ada di data, jangan memberi perkiraan: katakan harganya belum ada di daftar dan tawarkan untuk menanyakannya ke tim klinik (aturan 11).\n3. Jangan pernah menilai kondisi kulit seseorang atau memberi saran medis. Kalau pasien menyebut keluhan kulit biasa (misalnya jerawat, komedo, kusam, bekas jerawat, flek, pori besar, kulit kering), termasuk kalau ia bercerita tentang kulitnya sendiri, sebut perawatan yang Keterangan-nya di DATA KLINIK menyebut keluhan itu, lengkap dengan harga dan durasinya, sarankan konsultasi dokter untuk memastikan yang cocok, lalu tawarkan untuk meneruskan ke tim klinik (aturan 11). Jangan bilang perawatan itu pasti cocok atau pasti berhasil. Kalau tidak ada perawatan yang Keterangan-nya menyebut keluhan itu, katakan dengan jujur lalu tawarkan untuk meneruskan ke tim klinik. Kalau pasien menyebut kondisi yang serius (meradang, bernanah, berdarah, perih, alergi, iritasi, sedang hamil atau menyusui, atau reaksi setelah perawatan), langsung pakai tindakan \"teruskan\" dengan alasan \"kondisi_kulit\".\n4. Booking: kamu hanya mengumpulkan tiga hal, yaitu nama, perawatan, dan hari serta jam yang diinginkan. Kalau belum lengkap, pakai tindakan \"jawab\" dan tanyakan yang kurang dalam satu pesan. Kalau sudah lengkap, pakai tindakan \"teruskan\" dengan alasan \"booking\" dan isi bagian booking. Jangan pernah bilang jadwalnya tersedia atau sudah dikonfirmasi. Kalau pasien bertanya apakah jadwal tertentu masih kosong atau tersedia, anggap itu permintaan booking: jangan jawab kosong atau penuh, tanyakan data yang masih kurang (biasanya nama), dan sampaikan bahwa admin yang akan mengecek jadwalnya.\n5. Kalau pasien minta bicara dengan admin, dokter, atau orang: tindakan \"teruskan\", alasan \"minta_admin\". Kalau pasien mengeluh atau marah: tindakan \"teruskan\", alasan \"komplain\".\n6. Kalau pertanyaannya di luar urusan klinik atau kamu tidak yakin jawabannya: jangan menebak, katakan dengan jujur, lalu tawarkan untuk meneruskan ke tim klinik (aturan 11).\n7. Gaya: bahasa Indonesia sehari-hari yang sopan dan hangat, panggil \"Kak\", satu pesan, tanpa markdown dan tanpa tanda bintang. Jangan mengaku manusia. Jawaban biasa cukup 1 sampai 4 kalimat. Kalau jawabanmu menyebut 3 pilihan atau lebih (misalnya promo, harga beberapa perawatan, produk, atau jadwal), tulis sebagai daftar supaya enak dibaca: satu kalimat pembuka, baris kosong, satu baris untuk setiap pilihan yang diawali \"• \" (nama, harga, dan keterangan singkat kalau ada), lalu boleh satu kalimat penutup setelah baris kosong. Di dalam \"balasan\", pindah baris ditulis \\\\n. Format daftar ini hanya untuk pertanyaan yang jelas, bukan untuk sapaan di aturan 9.\n8. RIWAYAT CHAT bisa berisi pertanyaan yang sudah dijawab langsung oleh admin, karena balasan admin tidak tercatat di riwayat. Jangan menjawab ulang pertanyaan lama; jawab hanya PESAN BARU.\n9. Kalau PESAN BARU hanya sapaan atau pasien baru bilang ingin bertanya tanpa pertanyaan yang jelas (misalnya \"mau tanya-tanya perawatan wajah\"), jawab singkat dalam satu paragraf paling banyak 3 kalimat, tanpa daftar, tanpa harga, dan tanpa menyebut nama perawatan satu per satu: sebutkan jenis perawatan yang ada di DATA KLINIK cukup dengan nama Kategori-nya (tanpa Konsultasi dan Produk), lalu dalam kalimat terpisah sebutkan bahwa klinik juga punya konsultasi dokter dan produk skincare kalau keduanya ada di DATA KLINIK, lalu tanyakan keluhan atau kebutuhan pasien (misalnya jerawat, kusam, atau flek). Jangan balik bertanya \"ada yang bisa ditanyakan\" atau \"ada yang bisa dibantu\". Kalau pasien bilang ingin konsultasi, boleh sebut harga Konsultasi Dokter saja.\n10. Kalau RIWAYAT CHAT masih kosong, jangan mengucapkan selamat datang dan jangan menyebut nama klinik, karena sistem sudah menambahkan kalimat perkenalan.\n11. Menawarkan ke tim klinik: tulis tawarannya di akhir balasan, misalnya \"Mau saya teruskan ke tim klinik supaya dicek langsung?\", dengan tindakan \"jawab\". Kalau pesan terakhir Asisten di RIWAYAT CHAT berisi tawaran itu dan PESAN BARU menyetujuinya (misalnya iya, boleh, mau, oke, silakan), pakai tindakan \"teruskan\", isi \"setuju_diteruskan\" dengan true, dan pilih alasan sesuai topik yang ditawarkan: \"kondisi_kulit\" untuk keluhan kulit, \"harga_tidak_ada\" untuk harga yang tidak ada di data, atau \"lainnya\". Kalau pasien menolak atau bertanya hal lain, jawab seperti biasa.${bagianMenunggu}\n\nDATA KLINIK\nHarga perawatan:\n${harga}\n\nJadwal dokter dan terapis:\n${jadwal}\n\nPromo yang sedang berjalan:\n${promo}\n\nInfo umum:\n${info}\n\nRIWAYAT CHAT TERAKHIR\n${riwayat}\n\nPESAN BARU DARI PASIEN (bisa terdiri dari beberapa pesan beruntun; jawab semuanya dalam satu balasan)\n${chat.pesan}\n\nBalas HANYA dengan satu objek JSON, tanpa teks lain, dengan bentuk ini:\n{\"tindakan\":\"jawab atau teruskan\",\"alasan\":\"harga_tidak_ada, kondisi_kulit, booking, minta_admin, komplain, lainnya, atau null\",\"topik\":\"harga, jadwal, lokasi, promo, booking, kondisi_kulit, komplain, atau lainnya\",\"perawatan\":\"nama perawatan yang sedang ditanyakan atau diminta pasien, atau null\",\"balasan\":\"isi pesan untuk pasien\",\"setuju_diteruskan\":false,\"booking\":{\"nama\":\"\",\"perawatan\":\"\",\"waktu\":\"\"}}\nIsi \"perawatan\" dengan nama perawatan yang sedang dibicarakan pasien di pesan baru atau riwayat chat. Kalau perawatan itu ada di DATA KLINIK, tulis persis seperti di DATA KLINIK. Isi null kalau pasien belum menyebut perawatan tertentu.\nIsi \"setuju_diteruskan\" dengan true hanya kalau pasien baru saja menyetujui tawaran untuk diteruskan ke tim klinik; selain itu false.\nIsi \"booking\" dengan null kalau pasien tidak sedang booking.`;\n\nreturn [{ json: { prompt, harga_diizinkan: [...diizinkan].sort((a, b) => a - b) } }];\n"
+      }
+    },
+    {
+      "id": "b7599afd-6302-41f4-82f7-9131ecccc9dd",
+      "name": "Tanya AI",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [
+        1520,
+        240
+      ],
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.prompt }}"
+      },
+      "retryOnFail": true,
+      "waitBetweenTries": 3000,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "105dc33f-2f4e-449d-88f7-9fbd406d1705",
+      "name": "Model Gemini",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1552,
+        464
+      ],
+      "parameters": {
+        "modelName": "models/gemini-3.5-flash-lite",
+        "options": {
+          "temperature": 0.2
+        }
+      }
+    },
+    {
+      "id": "dfe7e348-f52c-4563-a09c-e97f4b0e2d97",
+      "name": "Periksa Jawaban",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1888,
+        240
+      ],
+      "parameters": {
+        "jsCode": "// Memeriksa jawaban AI sebelum dikirim. Kalau ada yang meragukan, chat diteruskan ke admin.\nconst cfg = $('Pengaturan').first().json;\nconst chat = $('Tentukan Jalur').first().json;\nconst bahan = $('Susun Prompt').first().json;\nconst mentah = $input.first().json;\n\nfunction nominalDari(teks) {\n  const hasil = [];\n  const t = String(teks ?? '').toLowerCase();\n  const pola = /(\\brp\\.?\\s*)?(\\d{1,3}(?:\\.\\d{3})+|\\d+(?:[.,]\\d+)?)(\\s*(ribu|rb|k|juta|jt)\\b)?/g;\n  let m;\n  while ((m = pola.exec(t)) !== null) {\n    const adaRp = Boolean(m[1]);\n    const satuan = m[4];\n    const ribuan = /^\\d{1,3}(\\.\\d{3})+$/.test(m[2]);\n    if (!adaRp && !satuan && !ribuan) continue;\n    let n = ribuan ? Number(m[2].replace(/\\./g, '')) : Number(m[2].replace(',', '.'));\n    if (satuan === 'ribu' || satuan === 'rb' || satuan === 'k') n *= 1000;\n    if (satuan === 'juta' || satuan === 'jt') n *= 1000000;\n    if (Number.isFinite(n) && n >= 1000) hasil.push(Math.round(n));\n  }\n  return hasil;\n}\nfunction keMenit(jam) {\n  const [h, m] = String(jam ?? '').split(/[:.]/).map(Number);\n  return (h || 0) * 60 + (m || 0);\n}\nfunction kapanDibalas() {\n  if (!chat.luar_jam) return 'Admin kami akan segera membalas Kakak.';\n  // Sebelum jam buka (misalnya jam 06.00) berarti hari ini; sesudah jam tutup berarti besok.\n  const jamKini = new Intl.DateTimeFormat('en-GB', {\n    timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit', hour12: false,\n  }).format(new Date(Date.now()));\n  const hari = keMenit(jamKini) < keMenit(cfg.jam_buka) ? 'hari ini' : 'besok';\n  return `Klinik sedang tutup, admin kami akan membalas Kakak ${hari} mulai pukul ${String(cfg.jam_buka).replace(':', '.')} WIB.`;\n}\n// Merapikan teks AI untuk WhatsApp: tanpa tanda bintang, butir daftar diseragamkan jadi \"• \", baris kosong paling banyak satu.\nfunction bersih(t) {\n  return String(t ?? '')\n    .replace(/\\\\n/g, '\\n')\n    .replace(/^[ \\t]*(?:[-*•·]|\\d+[.)])[ \\t]+/gm, '• ')\n    .replace(/\\*+/g, '')\n    .replace(/[ \\t]+\\n/g, '\\n')\n    .replace(/\\n{3,}/g, '\\n\\n')\n    .trim();\n}\n\n// 1. Membaca JSON dari jawaban AI.\nlet ai = null;\nlet catatan = '';\ntry {\n  if (mentah.error) throw new Error('AI gagal dipanggil');\n  let teks = mentah.text ?? mentah.response?.text ?? mentah.output ?? '';\n  if (typeof teks !== 'string') teks = JSON.stringify(teks);\n  const awal = teks.indexOf('{');\n  const akhir = teks.lastIndexOf('}');\n  if (awal === -1 || akhir <= awal) throw new Error('jawaban AI bukan JSON');\n  ai = JSON.parse(teks.slice(awal, akhir + 1));\n} catch (e) {\n  catatan = e.message;\n}\n\nconst alasanSah = ['harga_tidak_ada', 'kondisi_kulit', 'booking', 'minta_admin', 'komplain', 'lainnya'];\nconst topikSah = ['harga', 'jadwal', 'lokasi', 'promo', 'booking', 'kondisi_kulit', 'komplain', 'lainnya'];\n\nlet tindakan = ai && ['jawab', 'teruskan'].includes(ai.tindakan) ? ai.tindakan : 'teruskan';\nlet alasan = ai && alasanSah.includes(ai.alasan) ? ai.alasan : null;\nlet topik = ai && topikSah.includes(ai.topik) ? ai.topik : 'lainnya';\nlet balasan = ai ? bersih(ai.balasan) : '';\nlet booking = null;\nif (ai && ai.booking && typeof ai.booking === 'object') {\n  const b = {\n    nama: bersih(ai.booking.nama), perawatan: bersih(ai.booking.perawatan), waktu: bersih(ai.booking.waktu),\n  };\n  if (b.nama || b.perawatan || b.waktu) booking = b;\n}\n// Nama perawatan yang sedang dibicarakan, untuk sheet Prospek & Booking.\nlet perawatan = ai ? bersih(ai.perawatan) : '';\nif (/^(null|undefined|-)$/i.test(perawatan)) perawatan = '';\nif (!perawatan && booking && booking.perawatan) perawatan = booking.perawatan;\n\nif (!ai) { tindakan = 'teruskan'; alasan = 'lainnya'; }\n// Pasien baru saja menyetujui tawaran bot untuk diteruskan ke tim klinik.\nconst setuju = Boolean(ai && (ai.setuju_diteruskan === true || ai.setuju_diteruskan === 'true'));\n// AI kadang memilih \"teruskan booking\" padahal data booking belum lengkap dan balasannya justru bertanya.\n// Booking baru diserahkan ke admin kalau nama, perawatan, dan waktu sudah ada; selain itu kirim pertanyaan AI.\nconst bookingLengkap = booking && booking.nama && booking.perawatan && booking.waktu;\nif (ai && tindakan === 'teruskan' && alasan === 'booking' && !bookingLengkap && balasan) {\n  tindakan = 'jawab';\n  topik = 'booking';\n}\nif (tindakan === 'jawab' && !balasan) { tindakan = 'teruskan'; alasan = 'lainnya'; catatan = 'balasan AI kosong'; }\n\n// 2. Pagar harga: setiap nominal di balasan harus ada di data klinik.\nif (tindakan === 'jawab') {\n  const diizinkan = new Set(bahan.harga_diizinkan || []);\n  const asing = nominalDari(balasan).filter(n => !diizinkan.has(n));\n  if (asing.length) {\n    tindakan = 'teruskan'; alasan = 'harga_tidak_ada'; topik = 'harga';\n    catatan = 'AI menyebut nominal yang tidak ada di daftar: ' + asing.join(', ');\n  }\n}\n// 3. Balasan yang terlalu panjang biasanya tanda AI melantur. Daftar per baris boleh lebih panjang.\nconst batasPanjang = /\\n• /.test(balasan) ? 1500 : 900;\nif (tindakan === 'jawab' && balasan.length > batasPanjang) {\n  tindakan = 'teruskan'; alasan = 'lainnya'; catatan = 'balasan AI terlalu panjang';\n}\nif (tindakan === 'teruskan' && !alasan) alasan = 'lainnya';\n// Selama chat menunggu admin, jawaban bot ditandai supaya masa ditangani admin tidak dianggap selesai.\nif (tindakan === 'jawab' && chat.menunggu_admin) alasan = 'menunggu_admin';\nif (tindakan === 'teruskan' && alasan === 'booking') topik = 'booking';\nif (tindakan === 'teruskan' && alasan === 'kondisi_kulit') topik = 'kondisi_kulit';\n\n// 4. Untuk chat yang diteruskan, kalimat ke pasien memakai teks tetap, bukan karangan AI.\nconst sapa = chat.nama ? `Kak ${chat.nama.split(' ')[0]}` : 'Kak';\nconst SERAH = 'Mulai dari sini Kakak akan dibalas langsung oleh admin kami, bukan asisten AI.';\nconst SAMBIL = 'Sambil menunggu, kalau ada pertanyaan lain soal harga, jadwal, atau promo, Kakak tetap bisa tanya saya ya.';\n// Saklar jawab_saat_menunggu_admin di node Pengaturan (penjelasan lengkap di node Tentukan Jalur).\nconst modeMenunggu = String(cfg.jawab_saat_menunggu_admin ?? '').trim().toLowerCase();\nconst jawabSaatMenunggu = modeMenunggu === 'selalu' || (modeMenunggu === 'luar_jam' && Boolean(chat.luar_jam));\nfunction penutupSerah() {\n  return jawabSaatMenunggu ? `${kapanDibalas()} ${SAMBIL}` : `${SERAH} ${kapanDibalas()}`;\n}\nconst teksTerusan = {\n  harga_tidak_ada: `Untuk yang itu saya belum punya harga pastinya, Kak, jadi saya tidak mau asal sebut. Saya teruskan ke admin kami ya. ${penutupSerah()}`,\n  kondisi_kulit: `Untuk kondisi kulit, saya tidak memberi saran supaya tidak keliru. Pertanyaan Kakak saya teruskan ke admin kami agar dijawab langsung oleh tim klinik. ${penutupSerah()}`,\n  booking: `Baik ${booking && booking.nama ? 'Kak ' + booking.nama : sapa}, permintaan booking ${booking && booking.perawatan ? booking.perawatan : 'perawatan'}${booking && booking.waktu ? ' untuk ' + booking.waktu : ''} sudah saya catat dan saya teruskan ke admin. Jadwalnya belum pasti sampai admin mengonfirmasi. ${penutupSerah()}`,\n  minta_admin: `Baik Kak, saya sambungkan ke admin kami. ${penutupSerah()}`,\n  komplain: `Mohon maaf atas ketidaknyamanannya, Kak. Saya teruskan ke admin kami supaya segera ditangani. ${penutupSerah()}`,\n  lainnya: `Untuk yang itu saya teruskan ke admin kami ya, Kak, supaya jawabannya tepat. ${penutupSerah()}`,\n};\nlet pesan_pasien = tindakan === 'teruskan' ? teksTerusan[alasan] : balasan;\nif (tindakan === 'teruskan' && setuju && alasan !== 'booking') {\n  pesan_pasien = `Baik Kak, saya teruskan ke tim klinik ya. ${penutupSerah()}`;\n}\n\n// 5. Di pesan pertama, bot memperkenalkan diri sebagai asisten AI.\n//    Kalau jawaban sudah diawali sapaan (\"Halo Kak Rina, ...\" atau \"Baik Kak Rina, ...\"),\n//    sapaan itu dipakai sekali saja supaya tidak dobel.\nfunction perkenalan(teks, kalimat) {\n  const m = teks.match(/^(halo|hallo|hai|hi|selamat (?:pagi|siang|sore|malam)|baik)(?:\\s+juga)?\\s*,?\\s*(kak(?:ak)?(?:\\s+[^\\s,.!?]+){0,2})?\\s*[,.!]\\s*/i);\n  if (!m) return `Halo ${sapa}, ${kalimat} ` + teks;\n  const sebutan = m[2] && /\\s/.test(m[2].trim())\n    ? 'Kak ' + m[2].trim().split(/\\s+/).slice(1).join(' ')\n    : sapa;\n  let sisa = teks.slice(m[0].length);\n  if (/^baik$/i.test(m[1])) sisa = 'Baik, ' + sisa;\n  else sisa = sisa.charAt(0).toUpperCase() + sisa.slice(1);\n  return `Halo ${sebutan}, ${kalimat} ${sisa}`;\n}\nconst pesanPertama = (chat.riwayat || []).length === 0;\nif (pesanPertama && !/(saya|ini) asisten (AI|otomatis)/i.test(pesan_pasien)) {\n  pesan_pasien = perkenalan(pesan_pasien, `saya asisten AI ${cfg.nama_klinik}.`);\n}\n// 5b. Kalau bot baru aktif lagi setelah chat ini ditangani admin, beri tahu pasien bahwa yang membalas asisten AI.\nelse if (chat.kembali_aktif && !/(saya|ini) asisten (AI|otomatis)/i.test(pesan_pasien)) {\n  pesan_pasien = perkenalan(pesan_pasien, `ini asisten AI ${cfg.nama_klinik} lagi.`);\n}\n\n// 6. Pemberitahuan untuk admin kalau diteruskan.\nconst judul = {\n  harga_tidak_ada: 'Perlu ditangani: harga tidak ada di daftar',\n  kondisi_kulit: 'Perlu ditangani: pertanyaan kondisi kulit',\n  booking: 'Permintaan booking, mohon dikonfirmasi',\n  minta_admin: 'Perlu ditangani: pasien minta bicara dengan admin',\n  komplain: 'Perlu ditangani: komplain',\n  lainnya: 'Perlu ditangani',\n};\nlet pesan_admin = '';\n// Pesan pertama hari ini dari pasien yang masih menunggu admin: admin diingatkan sekali.\nif (tindakan === 'jawab' && chat.menunggu_admin && chat.admin_tambahan) pesan_admin = chat.admin_tambahan;\nif (tindakan === 'teruskan') {\n  const baris = [`[${judul[alasan]}]`, `Dari: ${chat.nama || 'tanpa nama'} (${chat.nomor})`];\n  if (alasan === 'booking' && booking) {\n    baris.push(`Nama: ${booking.nama || '-'}`, `Perawatan: ${booking.perawatan || '-'}`, `Waktu diminta: ${booking.waktu || '-'}`);\n  }\n  if (setuju) {\n    const konteks = (chat.riwayat || []).slice(-4)\n      .map(r => `${r.arah === 'masuk' ? 'Pasien' : 'Bot'}: ${String(r.pesan || '').slice(0, 200)}`);\n    if (konteks.length) baris.push('Percakapan sebelumnya:', ...konteks);\n  }\n  baris.push(`Pesan: \"${chat.pesan}\"`);\n  if (catatan) baris.push(`Catatan sistem: ${catatan}`);\n  pesan_admin = baris.join('\\n');\n}\n\nreturn [{ json: {\n  perlu_ai: true, nomor: chat.nomor, nama: chat.nama,\n  pesan_pasien, pesan_admin,\n  log: { tindakan, alasan, topik, booking, perawatan },\n  catatan_sistem: catatan,\n} }];\n"
+      }
+    },
+    {
+      "id": "26e021c9-9193-4459-95ce-4fed7f9e1a10",
+      "name": "Susun Kiriman",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2112,
+        384
+      ],
+      "parameters": {
+        "jsCode": "// Mengubah keputusan menjadi daftar pesan WhatsApp: satu untuk pasien, satu untuk admin.\nconst cfg = $('Pengaturan').first().json;\nconst k = $input.first().json;\n\nconst adminRapi = String(cfg.nomor_admin ?? '').replace(/\\D/g, '');\nconst kiriman = [];\nif (k.pesan_pasien) kiriman.push({ jenis: 'pasien', target: k.nomor, message: k.pesan_pasien });\nif (k.pesan_admin && adminRapi.length >= 9) kiriman.push({ jenis: 'admin', target: adminRapi, message: k.pesan_admin });\n\nconst dasar = {\n  nomor: k.nomor,\n  pesan_pasien: k.pesan_pasien || '',\n  log: k.log,\n  ada_kiriman: kiriman.length > 0,\n};\nif (kiriman.length === 0) return [{ json: { ...dasar, jenis: '', target: '', message: '' } }];\nreturn kiriman.map(x => ({ json: { ...dasar, ...x } }));\n"
+      }
+    },
+    {
+      "id": "6765cc91-9c7f-4c22-b369-60080642804c",
+      "name": "Ada yang dikirim?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2320,
+        384
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8927b2ff-dee0-4b58-a85e-ca8e59a67363",
+              "leftValue": "={{ $json.ada_kiriman }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "bfc9743a-953e-4048-90c3-62780f9efe6b",
+      "name": "Kirim WhatsApp",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2544,
+        288
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.fonnte.com/send",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "target",
+              "value": "={{ $json.target }}"
+            },
+            {
+              "name": "message",
+              "value": "={{ $json.message }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "e8f40ff6-b613-49ef-b17f-b8b561ea9fa7",
+      "name": "Siapkan Catatan",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2768,
+        384
+      ],
+      "parameters": {
+        "jsCode": "// Menyiapkan satu baris catatan untuk Supabase: apa yang dilakukan bot terhadap chat ini.\nconst kiriman = $('Susun Kiriman').all().map(i => i.json);\nconst k = kiriman[0];\n\n// Balasan dianggap terkirim kalau Fonnte tidak melaporkan gagal untuk pesan ke pasien.\nlet terkirim = false;\nif (k.ada_kiriman && $('Kirim WhatsApp').isExecuted) {\n  const hasil = $('Kirim WhatsApp').all().map(i => i.json);\n  const urutanPasien = kiriman.findIndex(x => x.jenis === 'pasien');\n  if (urutanPasien !== -1) {\n    const h = hasil[urutanPasien] || {};\n    terkirim = !h.error && h.status !== false && h.status !== 'false';\n  }\n}\n\nreturn [{ json: {\n  p_nomor: k.nomor,\n  p_pesan_pasien: k.pesan_pasien || null,\n  p_tindakan: k.log.tindakan,\n  p_alasan: k.log.alasan,\n  p_topik: k.log.topik,\n  p_booking: k.log.booking,\n  p_terkirim: terkirim,\n} }];\n"
+      }
+    },
+    {
+      "id": "eb8ae12c-3205-4fb1-8704-2dd423874a56",
+      "name": "Catat Hasil",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2992,
+        384
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Pengaturan').first().json.supabase_url.replace(/\\/+$/, '') }}/rest/v1/rpc/catat_hasil",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "75b9c367-1204-4830-825c-9cc8c929ebf8",
+      "name": "Baca Prospek",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        3216,
+        384
+      ],
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Pengaturan').first().json.id_sheet_prospek }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Prospek"
+        },
+        "options": {}
+      },
+      "executeOnce": true,
+      "onError": "continueRegularOutput",
+      "alwaysOutputData": true
+    },
+    {
+      "id": "90e2ffbc-bf55-4f0f-9315-e97176b6be0f",
+      "name": "Tulis Prospek",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        3664,
+        384
+      ],
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Pengaturan').first().json.id_sheet_prospek }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Prospek"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "matchingColumns": [
+            "Nomor WA"
+          ],
+          "schema": [
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Nomor WA",
+              "id": "Nomor WA",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Nama",
+              "id": "Nama",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Perawatan",
+              "id": "Perawatan",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Waktu Diminta",
+              "id": "Waktu Diminta",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Status",
+              "id": "Status",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Pertama Chat",
+              "id": "Pertama Chat",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Terakhir Chat",
+              "id": "Terakhir Chat",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Diteruskan Pada",
+              "id": "Diteruskan Pada",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Pesan Terakhir",
+              "id": "Pesan Terakhir",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Label",
+              "id": "Label",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "Catatan Admin",
+              "id": "Catatan Admin",
+              "required": false,
+              "type": "string"
+            }
+          ],
+          "value": {}
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED",
+          "handlingExtraData": "ignoreIt"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "bbe1a713-0d48-4655-ab34-8a19971b6419",
+      "name": "Catatan 4",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3184,
+        144
+      ],
+      "parameters": {
+        "content": "## 4. Catat ke sheet Prospek & Booking\nSetelah balasan terkirim, nomor pasien dicatat atau statusnya dimajukan: Tanya-tanya, lalu Menunggu Konfirmasi saat booking diteruskan.\n\nStatus Batal dan Terkonfirmasi yang diubah admin tidak ditimpa. Kalau sheet gagal dibaca, tidak ada yang ditulis.",
+        "height": 200,
+        "width": 680,
+        "color": 6
+      }
+    },
+    {
+      "id": "0827c850-3b11-458f-9d7d-73fecdecf8ef",
+      "name": "Siapkan Prospek",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3440,
+        384
+      ],
+      "parameters": {
+        "jsCode": "// Menyiapkan satu baris untuk sheet Prospek & Booking.\n// Aturan: bot hanya MEMAJUKAN status (Tanya-tanya -> Menunggu Konfirmasi).\n// Status Batal dan Terkonfirmasi yang diisi admin tidak ditimpa, kecuali pasien Batal mengajukan booking baru.\nconst chat = $('Cek Pasien Lama').first().json;\nconst kiriman = $('Susun Kiriman').first().json;\nconst baris = $('Baca Prospek').all().map(i => i.json);\n\n// Kalau sheet gagal dibaca, jangan menulis apa pun supaya tidak muncul baris ganda.\nif (baris.some(b => b && b.error)) return [];\n\nfunction nomorRapi(n) {\n  let d = String(n ?? '').replace(/\\D/g, '');\n  if (d.startsWith('0')) d = '62' + d.slice(1);\n  else if (d.startsWith('8')) d = '62' + d;\n  return d;\n}\nfunction teks(v) {\n  const t = String(v ?? '').trim();\n  return /^(null|undefined|-)$/i.test(t) ? '' : t;\n}\n\nconst sekarang = new Intl.DateTimeFormat('sv-SE', {\n  timeZone: 'Asia/Jakarta', year: 'numeric', month: '2-digit', day: '2-digit',\n  hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false,\n}).format(new Date());\n\n// Label dihitung oleh Google Sheets sendiri, jadi ikut berubah walau workflow tidak berjalan.\nconst LABEL = '=IF(INDIRECT(\"E\"&ROW())<>\"Menunggu Konfirmasi\",\"\",IF(INDIRECT(\"H\"&ROW())=\"\",\"\",IF(NOW()-INDIRECT(\"H\"&ROW())>1,\"⚠️ Lewat 24 jam\",\"\")))';\n\nconst ada = baris.find(b => b && b['Nomor WA'] && nomorRapi(b['Nomor WA']) === chat.nomor);\nconst statusSekarang = ada ? teks(ada.Status) : '';\nconst log = kiriman.log || {};\nconst booking = log.booking || {};\nconst minta = log.tindakan === 'teruskan' && log.alasan === 'booking';\nconst perawatan = teks(log.perawatan) || teks(booking.perawatan);\nconst pesan = (chat.pesan || (chat.media ? '(mengirim foto atau berkas)' : '')).slice(0, 300);\n\n// Pasien lama (nomornya sudah ada di sheet Booking): tidak ditambahkan sebagai prospek baru.\n// Kalau sebelumnya prospek, statusnya otomatis menjadi Terkonfirmasi.\nif (chat.pasien_lama) {\n  if (!ada) return [];\n  const out = { 'Nomor WA': chat.nomor, 'Terakhir Chat': sekarang, 'Pesan Terakhir': pesan };\n  if (['', 'Tanya-tanya', 'Menunggu Konfirmasi'].includes(statusSekarang)) out['Status'] = 'Terkonfirmasi';\n  return [{ json: out }];\n}\n\nconst out = { 'Nomor WA': chat.nomor, 'Terakhir Chat': sekarang, 'Pesan Terakhir': pesan, 'Label': LABEL };\nconst namaBooking = teks(booking.nama);\nconst namaChat = teks(chat.nama_di_sheet) || teks(chat.nama);\n\nif (!ada) {\n  out['Nama'] = namaBooking || namaChat;\n  out['Pertama Chat'] = sekarang;\n  out['Perawatan'] = perawatan;\n  out['Status'] = minta ? 'Menunggu Konfirmasi' : 'Tanya-tanya';\n  if (minta) {\n    out['Waktu Diminta'] = teks(booking.waktu);\n    out['Diteruskan Pada'] = sekarang;\n  }\n  return [{ json: out }];\n}\n\nif (namaBooking) out['Nama'] = namaBooking;\nelse if (!teks(ada.Nama) && namaChat) out['Nama'] = namaChat;\nif (perawatan) out['Perawatan'] = perawatan;\n\nif (minta && statusSekarang !== 'Terkonfirmasi') {\n  if (teks(booking.waktu)) out['Waktu Diminta'] = teks(booking.waktu);\n  if (statusSekarang !== 'Menunggu Konfirmasi' || !teks(ada['Diteruskan Pada'])) {\n    // Permintaan baru (termasuk dari pasien yang sebelumnya Batal): jam tunggu dimulai dari sekarang.\n    out['Status'] = 'Menunggu Konfirmasi';\n    out['Diteruskan Pada'] = sekarang;\n  }\n  // Kalau sudah Menunggu Konfirmasi, jam tunggu tidak di-reset supaya permintaan lama tetap terlihat menggantung.\n} else if (!statusSekarang) {\n  out['Status'] = 'Tanya-tanya';\n}\n\nreturn [{ json: out }];\n"
+      }
+    },
+    {
+      "id": "7ea3c028-6ae8-4c07-95f8-991db95e57d6",
+      "name": "Cek Ambil Alih",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        16,
+        480
+      ],
+      "parameters": {
+        "url": "={{ $('Pengaturan').first().json.supabase_url.replace(/\\/+$/, '') }}/rest/v1/chat_log",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "select",
+              "value": "id,waktu,arah,pesan,tindakan,alasan,topik,id_pesan,dari_iklan"
+            },
+            {
+              "name": "nomor",
+              "value": "={{ 'eq.' + $('Cek Pasien Lama').first().json.nomor }}"
+            },
+            {
+              "name": "waktu",
+              "value": "={{ 'gte.' + new Date(Date.now() - 8 * 86400000).toISOString() }}"
+            },
+            {
+              "name": "order",
+              "value": "id.desc"
+            },
+            {
+              "name": "limit",
+              "value": "200"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "onError": "continueRegularOutput",
+      "alwaysOutputData": true,
+      "notes": "Riwayat nomor ini 8 hari terakhir dari chat_log, untuk mengetahui apakah chat sedang ditangani admin."
+    },
+    {
+      "id": "4a342ce6-4941-4f8a-a1f1-e70894accf1a",
+      "name": "Tunggu Pasien Selesai",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -176,
+        480
+      ],
+      "parameters": {
+        "amount": 5,
+        "resume": "timeInterval",
+        "unit": "seconds"
+      },
+      "notes": "Menunggu 10 detik supaya pesan yang dikirim beruntun (banyak bubble) dibalas sekali. Angka ini harus sama dengan TUNGGU_DETIK di Tentukan Jalur."
+    },
+    {
+      "id": "11599d31-9583-4bca-8669-a396042ac44b",
+      "name": "Cek Sapaan Kilat",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -464,
+        688
+      ],
+      "parameters": {
+        "jsCode": "// Sapaan kilat: pesan PERTAMA yang isinya hanya sapaan (\"halo kak\", \"permisi, mau tanya-tanya perawatan wajah\")\n// langsung dibalas dengan kalimat jadi dari Pengaturan (isi_sapaan_kilat), tanpa menunggu bubble berikutnya\n// dan tanpa bertanya ke AI. Pesan lain lanjut ke jalur biasa (Tunggu Pasien Selesai).\nconst cfg = $('Pengaturan').first().json;\nconst chat = $('Cek Pasien Lama').first().json;\nconst status = $('Catat Chat Masuk').first().json;\nconst isi = String(cfg.isi_sapaan_kilat ?? '').trim();\n\n// Kata yang boleh ada di sapaan. Huruf berulang dirapikan dulu (\"haloo\" -> \"halo\", \"assalamualaikum\" -> \"asalamualaikum\").\nconst SAPA = ['halo', 'helo', 'hai', 'hay', 'hi', 'hy', 'hey', 'pagi', 'siang', 'sore', 'malam', 'permisi',\n  'asalamualaikum', 'asalamu', 'salam', 'kak', 'kakak', 'min', 'admin', 'mimin', 'mba', 'mbak', 'sis', 'sist',\n  'gan', 'dok', 'tanya', 'nanya', 'bertanya', 'info', 'informasi'];\nconst PELENGKAP = ['selamat', 'alaikum', 'wr', 'wb', 'warahmatulahi', 'wabarakatuh', 'ka', 'mas', 'bu', 'ibu', 'pak',\n  'mau', 'ingin', 'pengen', 'pingin', 'pengin', 'boleh', 'bisa', 'saya', 'aku', 'sy', 'aq', 'dong', 'donk', 'ya', 'yah',\n  'nih', 'dulu', 'sedikit', 'dikit', 'seputar', 'soal', 'tentang', 'mengenai', 'perawatan', 'treatment', 'wajah',\n  'muka', 'kulit', 'klinik', 'di', 'sini', 'disini', 'ini', 'mohon', 'minta', 'numpang', 'kah', 'nya'];\nconst BOLEH = new Set([...SAPA, ...PELENGKAP]);\nconst WAJIB = new Set(SAPA);\n\nfunction hanyaSapaan(teks) {\n  const kata = String(teks ?? '').toLowerCase()\n    .replace(/[^a-z\\s]/g, ' ')\n    .split(/\\s+/).filter(Boolean)\n    .map(k => k.replace(/(.)\\1+/g, '$1'));\n  if (kata.length === 0 || kata.length > 12) return false;\n  return kata.every(k => BOLEH.has(k)) && kata.some(k => WAJIB.has(k));\n}\n\nconst kilat = isi !== ''\n  && !chat.pasien_lama\n  && !chat.media\n  && !status.duplikat\n  && (status.riwayat || []).length === 0\n  && !(cfg.jawab_hanya_di_luar_jam === true && !chat.luar_jam)\n  && Number(status.balasan_bot_bulan_ini || 0) < Number(cfg.batas_balasan_per_bulan || Infinity)\n  && hanyaSapaan(chat.pesan);\n\nif (!kilat) return [{ json: { kilat: false } }];\n\nconst sapaNama = chat.nama ? `Kak ${String(chat.nama).trim().split(/\\s+/)[0]}` : 'Kak';\nreturn [{ json: {\n  kilat: true,\n  perlu_ai: false,\n  nomor: chat.nomor,\n  nama: chat.nama,\n  pesan_pasien: `Halo ${sapaNama}, saya asisten AI ${cfg.nama_klinik}. ${isi}`,\n  pesan_admin: '',\n  log: { tindakan: 'jawab', alasan: 'sapaan_kilat', topik: 'lainnya', booking: null },\n} }];\n",
+        "mode": "runOnceForAllItems"
+      },
+      "notes": "Pesan pertama yang hanya sapaan dibalas langsung dengan kalimat isi_sapaan_kilat di Pengaturan (tanpa tunggu, tanpa AI). Kosongkan isi_sapaan_kilat untuk mematikan."
+    },
+    {
+      "id": "6a3a29d4-421d-43db-a1d3-5287a1e32347",
+      "name": "Sapaan kilat?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -240,
+        688
+      ],
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "a1b2c3d4-kilat-if-0001",
+              "leftValue": "={{ $json.kilat }}",
+              "operator": {
+                "operation": "true",
+                "singleValue": true,
+                "type": "boolean"
+              },
+              "rightValue": ""
+            }
+          ],
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          }
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      }
+    },
+    {
+      "id": "36f040c5-75ef-4347-8861-3a93a3fce7ce",
+      "name": "Baca Salinan Data",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        432,
+        32
+      ],
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "cachedResultName": "Salinan Data Klinik",
+          "mode": "id",
+          "value": "YOUR_CLINIC_DATA_COPY_TABLE_ID"
+        },
+        "filters": {},
+        "matchType": "anyCondition",
+        "operation": "get",
+        "resource": "row",
+        "returnAll": true
+      },
+      "executeOnce": true,
+      "onError": "continueRegularOutput",
+      "alwaysOutputData": true,
+      "notes": "Salinan 4 tab Data Klinik, diperbarui workflow Klinik - Perbarui Salinan Data tiap 30 menit."
+    },
+    {
+      "id": "edcc06bb-14b3-441e-a36a-06b1348efc75",
+      "name": "Data Klinik",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        32
+      ],
+      "parameters": {
+        "jsCode": "// Membaca salinan Data Klinik dari data table \"Salinan Data Klinik\" (diisi workflow Klinik - Perbarui Salinan Data).\n// ada = true kalau keempat tab tersedia dan salinannya belum lebih dari 6 jam. Kalau false, workflow membaca Google Sheets langsung.\nconst baris = $input.all().map(i => i.json).filter(r => r && r.tab);\nconst out = { ada: false };\nlet tertua = Infinity;\nfor (const r of baris) {\n  try {\n    const isi = JSON.parse(r.isi || '[]');\n    if (Array.isArray(isi)) out[r.tab] = isi;\n  } catch (e) {\n    // baris rusak diabaikan\n  }\n  const t = Date.parse(r.diperbarui);\n  if (Number.isFinite(t)) tertua = Math.min(tertua, t);\n}\nconst lengkap = Array.isArray(out.harga) && out.harga.length > 0\n  && ['jadwal', 'promo', 'info'].every(t => Array.isArray(out[t]));\nconst segar = Number.isFinite(tertua) && Date.now() - tertua < 6 * 3600000;\nout.ada = lengkap && segar;\nout.diperbarui = Number.isFinite(tertua) ? new Date(tertua).toISOString() : '';\nreturn [{ json: out }];\n",
+        "mode": "runOnceForAllItems"
+      }
+    },
+    {
+      "id": "8927153e-9d59-4d97-bbe6-cdeb1041a6c7",
+      "name": "Salinan ada?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        864,
+        32
+      ],
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "b2c3d4e5-salinan-if-0001",
+              "leftValue": "={{ $json.ada }}",
+              "operator": {
+                "operation": "true",
+                "singleValue": true,
+                "type": "boolean"
+              },
+              "rightValue": ""
+            }
+          ],
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          }
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook Fonnte": {
+      "main": [
+        [
+          {
+            "node": "Pengaturan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pengaturan": {
+      "main": [
+        [
+          {
+            "node": "Rapikan Pesan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rapikan Pesan": {
+      "main": [
+        [
+          {
+            "node": "Pesan layak diproses?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pesan layak diproses?": {
+      "main": [
+        [
+          {
+            "node": "Baca Booking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Baca Booking": {
+      "main": [
+        [
+          {
+            "node": "Cek Pasien Lama",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cek Pasien Lama": {
+      "main": [
+        [
+          {
+            "node": "Catat Chat Masuk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tentukan Jalur": {
+      "main": [
+        [
+          {
+            "node": "Perlu dijawab AI?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Perlu dijawab AI?": {
+      "main": [
+        [
+          {
+            "node": "Baca Salinan Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Susun Kiriman",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Baca Harga": {
+      "main": [
+        [
+          {
+            "node": "Baca Jadwal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Baca Jadwal": {
+      "main": [
+        [
+          {
+            "node": "Baca Promo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Baca Promo": {
+      "main": [
+        [
+          {
+            "node": "Baca Info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Baca Info": {
+      "main": [
+        [
+          {
+            "node": "Susun Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Susun Prompt": {
+      "main": [
+        [
+          {
+            "node": "Tanya AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Model Gemini": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Tanya AI",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tanya AI": {
+      "main": [
+        [
+          {
+            "node": "Periksa Jawaban",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Periksa Jawaban": {
+      "main": [
+        [
+          {
+            "node": "Susun Kiriman",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Susun Kiriman": {
+      "main": [
+        [
+          {
+            "node": "Ada yang dikirim?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ada yang dikirim?": {
+      "main": [
+        [
+          {
+            "node": "Kirim WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Siapkan Catatan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Kirim WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Siapkan Catatan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Siapkan Catatan": {
+      "main": [
+        [
+          {
+            "node": "Catat Hasil",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Catat Hasil": {
+      "main": [
+        [
+          {
+            "node": "Baca Prospek",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Baca Prospek": {
+      "main": [
+        [
+          {
+            "node": "Siapkan Prospek",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Siapkan Prospek": {
+      "main": [
+        [
+          {
+            "node": "Tulis Prospek",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cek Ambil Alih": {
+      "main": [
+        [
+          {
+            "node": "Tentukan Jalur",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tunggu Pasien Selesai": {
+      "main": [
+        [
+          {
+            "node": "Cek Ambil Alih",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Catat Chat Masuk": {
+      "main": [
+        [
+          {
+            "node": "Cek Sapaan Kilat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cek Sapaan Kilat": {
+      "main": [
+        [
+          {
+            "node": "Sapaan kilat?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sapaan kilat?": {
+      "main": [
+        [
+          {
+            "node": "Susun Kiriman",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Tunggu Pasien Selesai",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Baca Salinan Data": {
+      "main": [
+        [
+          {
+            "node": "Data Klinik",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data Klinik": {
+      "main": [
+        [
+          {
+            "node": "Salinan ada?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Salinan ada?": {
+      "main": [
+        [
+          {
+            "node": "Susun Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Baca Harga",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": []
+}

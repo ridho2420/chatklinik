@@ -1,0 +1,456 @@
+{
+  "name": "Utilitas - Isi Data Klinik",
+  "nodes": [
+    {
+      "id": "c72f3cf0-8285-4b84-a625-b20c762c8d93",
+      "name": "Jalankan",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "369b3580-b0b0-42f9-a6ef-e9ef8a449516",
+      "name": "Kosongkan Harga",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        220,
+        0
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "clear",
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "YOUR_CLINIC_DATA_SHEET_ID"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Harga"
+        },
+        "clear": "wholeSheet",
+        "keepFirstRow": true
+      },
+      "executeOnce": true
+    },
+    {
+      "id": "845c66dd-24ca-45f1-9fa6-c1ea89502ed0",
+      "name": "Data Harga",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        0
+      ],
+      "parameters": {
+        "jsCode": "// Isi tab Harga di sheet Data Klinik (data contoh Klinik Aura Derma).\nconst baris = [\n  {\"Perawatan\":\"Konsultasi Dokter\",\"Kategori\":\"Konsultasi\",\"Harga\":100000,\"Durasi\":\"15 menit\",\"Keterangan\":\"Dokter memeriksa kulit dan menyarankan perawatan yang cocok. Gratis kalau lanjut perawatan di hari yang sama\",\"Downtime\":\"Tidak ada\",\"Sesi Disarankan\":\"Sekali sebelum perawatan oleh dokter\",\"Persiapan\":\"Sebaiknya datang tanpa makeup\"},\n  {\"Perawatan\":\"Facial Basic\",\"Kategori\":\"Facial\",\"Harga\":175000,\"Durasi\":\"45 menit\",\"Keterangan\":\"Pembersihan wajah rutin untuk semua jenis kulit, oleh terapis\",\"Downtime\":\"Tidak ada\",\"Sesi Disarankan\":\"Sebulan sekali\",\"Persiapan\":\"\"},\n  {\"Perawatan\":\"Facial Acne\",\"Kategori\":\"Facial\",\"Harga\":250000,\"Durasi\":\"60 menit\",\"Keterangan\":\"Untuk kulit berjerawat ringan dan komedo, oleh terapis\",\"Downtime\":\"Kemerahan ringan beberapa jam\",\"Sesi Disarankan\":\"2 minggu sekali, 3 sampai 4 kali\",\"Persiapan\":\"Jangan memencet jerawat sendiri 2 hari sebelumnya\"},\n  {\"Perawatan\":\"Facial Hydrating\",\"Kategori\":\"Facial\",\"Harga\":275000,\"Durasi\":\"60 menit\",\"Keterangan\":\"Untuk kulit kering, kulit terasa tertarik, dan kusam karena kurang lembap, oleh terapis\",\"Downtime\":\"Tidak ada\",\"Sesi Disarankan\":\"2 sampai 4 minggu sekali\",\"Persiapan\":\"\"},\n  {\"Perawatan\":\"Facial Brightening\",\"Kategori\":\"Facial\",\"Harga\":300000,\"Durasi\":\"60 menit\",\"Keterangan\":\"Untuk wajah kusam dan warna kulit tidak merata, oleh terapis\",\"Downtime\":\"Tidak ada\",\"Sesi Disarankan\":\"2 sampai 4 minggu sekali\",\"Persiapan\":\"\"},\n  {\"Perawatan\":\"Microdermabrasion\",\"Kategori\":\"Facial\",\"Harga\":350000,\"Durasi\":\"45 menit\",\"Keterangan\":\"Untuk tekstur kulit kasar, kusam, dan komedo, oleh terapis\",\"Downtime\":\"Kemerahan ringan sekitar 1 hari\",\"Sesi Disarankan\":\"2 minggu sekali, 4 kali\",\"Persiapan\":\"Berhenti memakai produk retinol 3 hari sebelumnya\"},\n  {\"Perawatan\":\"Facial Gold Glow\",\"Kategori\":\"Facial\",\"Harga\":400000,\"Durasi\":\"75 menit\",\"Keterangan\":\"Facial premium dengan pijat wajah, untuk wajah kusam dan tampak lelah, oleh terapis\",\"Downtime\":\"Tidak ada\",\"Sesi Disarankan\":\"Sebulan sekali\",\"Persiapan\":\"\"},\n  {\"Perawatan\":\"Acne Peeling\",\"Kategori\":\"Peeling\",\"Harga\":400000,\"Durasi\":\"30 menit\",\"Keterangan\":\"Untuk jerawat aktif dan komedo. Oleh dokter, perlu konsultasi dulu\",\"Downtime\":\"Kulit mengelupas halus 2 sampai 4 hari\",\"Sesi Disarankan\":\"2 minggu sekali, sesuai saran dokter\",\"Persiapan\":\"Berhenti memakai retinol dan scrub 5 hari sebelumnya, hindari berjemur\"},\n  {\"Perawatan\":\"Chemical Peeling\",\"Kategori\":\"Peeling\",\"Harga\":450000,\"Durasi\":\"30 menit\",\"Keterangan\":\"Untuk bekas jerawat dan tekstur kulit kasar. Oleh dokter, perlu konsultasi dulu\",\"Downtime\":\"Kulit mengelupas halus 3 sampai 5 hari\",\"Sesi Disarankan\":\"2 sampai 4 minggu sekali, 3 sampai 6 kali\",\"Persiapan\":\"Berhenti memakai retinol dan scrub 5 hari sebelumnya, hindari berjemur\"},\n  {\"Perawatan\":\"Laser Hair Removal Ketiak\",\"Kategori\":\"Laser\",\"Harga\":500000,\"Durasi\":\"20 menit\",\"Keterangan\":\"Untuk mengurangi bulu ketiak. Oleh dokter\",\"Downtime\":\"Tidak ada\",\"Sesi Disarankan\":\"4 sampai 6 minggu sekali, 6 sampai 8 kali\",\"Persiapan\":\"Cukur bulu sehari sebelumnya, jangan dicabut atau waxing 2 minggu sebelumnya\"},\n  {\"Perawatan\":\"Microneedling (Dermapen)\",\"Kategori\":\"Microneedling\",\"Harga\":750000,\"Durasi\":\"60 menit\",\"Keterangan\":\"Untuk bekas jerawat bopeng, pori besar, dan tekstur kulit tidak rata. Oleh dokter, perlu konsultasi dulu\",\"Downtime\":\"Kemerahan 1 sampai 3 hari\",\"Sesi Disarankan\":\"Sebulan sekali, 3 sampai 6 kali\",\"Persiapan\":\"Berhenti memakai retinol 5 hari sebelumnya\"},\n  {\"Perawatan\":\"Laser Rejuvenation\",\"Kategori\":\"Laser\",\"Harga\":1250000,\"Durasi\":\"45 menit\",\"Keterangan\":\"Untuk flek, pori besar, dan tanda penuaan. Oleh dokter, perlu konsultasi dulu\",\"Downtime\":\"Kemerahan ringan 1 sampai 2 hari\",\"Sesi Disarankan\":\"Sebulan sekali, 3 sampai 5 kali\",\"Persiapan\":\"Hindari berjemur 1 minggu sebelumnya\"},\n  {\"Perawatan\":\"Laser Pico Flek\",\"Kategori\":\"Laser\",\"Harga\":1500000,\"Durasi\":\"30 menit\",\"Keterangan\":\"Untuk flek hitam dan noda gelap. Oleh dokter, perlu konsultasi dulu\",\"Downtime\":\"Flek bisa tampak lebih gelap 3 sampai 7 hari sebelum memudar\",\"Sesi Disarankan\":\"3 sampai 4 minggu sekali, sesuai saran dokter\",\"Persiapan\":\"Hindari berjemur 1 minggu sebelumnya\"},\n  {\"Perawatan\":\"Facial Wash Aura Gentle\",\"Kategori\":\"Produk\",\"Harga\":85000,\"Durasi\":\"\",\"Keterangan\":\"Sabun cuci muka lembut untuk pemakaian harian\",\"Downtime\":\"\",\"Sesi Disarankan\":\"\",\"Persiapan\":\"\"},\n  {\"Perawatan\":\"Sunscreen Aura SPF 50\",\"Kategori\":\"Produk\",\"Harga\":120000,\"Durasi\":\"\",\"Keterangan\":\"Tabir surya harian untuk semua jenis kulit\",\"Downtime\":\"\",\"Sesi Disarankan\":\"\",\"Persiapan\":\"\"},\n  {\"Perawatan\":\"Moisturizer Aura Barrier\",\"Kategori\":\"Produk\",\"Harga\":135000,\"Durasi\":\"\",\"Keterangan\":\"Pelembap untuk kulit kering\",\"Downtime\":\"\",\"Sesi Disarankan\":\"\",\"Persiapan\":\"\"},\n  {\"Perawatan\":\"Acne Serum Aura\",\"Kategori\":\"Produk\",\"Harga\":150000,\"Durasi\":\"\",\"Keterangan\":\"Serum untuk kulit berjerawat, sebaiknya dipakai sesuai saran dokter\",\"Downtime\":\"\",\"Sesi Disarankan\":\"\",\"Persiapan\":\"\"}\n];\nreturn baris.map(json => ({ json }));"
+      }
+    },
+    {
+      "id": "fb19c629-d02f-411c-afc8-ec064065b1b9",
+      "name": "Tulis Harga",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        660,
+        0
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "append",
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "YOUR_CLINIC_DATA_SHEET_ID"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Harga"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "schema": []
+        },
+        "options": {
+          "cellFormat": "RAW",
+          "handlingExtraData": "insertInNewColumn"
+        }
+      }
+    },
+    {
+      "id": "c0ca89f7-58b8-40c0-8af7-55e39aebc260",
+      "name": "Kosongkan Jadwal",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        880,
+        0
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "clear",
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "YOUR_CLINIC_DATA_SHEET_ID"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Jadwal"
+        },
+        "clear": "wholeSheet",
+        "keepFirstRow": true
+      },
+      "executeOnce": true
+    },
+    {
+      "id": "f848e7ba-507b-41b9-88f8-8a383cc9ecbf",
+      "name": "Data Jadwal",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1100,
+        0
+      ],
+      "parameters": {
+        "jsCode": "// Isi tab Jadwal di sheet Data Klinik (data contoh Klinik Aura Derma).\nconst baris = [\n  {\"Nama\":\"dr. Maya Lestari\",\"Peran\":\"Dokter\",\"Hari\":\"Senin, Rabu, Jumat\",\"Jam\":\"10.00 sampai 17.00\",\"Keterangan\":\"\",\"Keahlian\":\"Perawatan jerawat, bekas jerawat, dan peeling\"},\n  {\"Nama\":\"dr. Indra Wijaya\",\"Peran\":\"Dokter\",\"Hari\":\"Selasa, Kamis, Sabtu\",\"Jam\":\"11.00 sampai 19.00\",\"Keterangan\":\"\",\"Keahlian\":\"Laser, flek, microneedling, dan peremajaan kulit\"},\n  {\"Nama\":\"Terapis\",\"Peran\":\"Terapis\",\"Hari\":\"Setiap hari\",\"Jam\":\"09.00 sampai 20.00\",\"Keterangan\":\"Tiga terapis bergantian\",\"Keahlian\":\"Facial, microdermabrasion, dan perawatan tanpa dokter\"},\n  {\"Nama\":\"Catatan\",\"Peran\":\"\",\"Hari\":\"Minggu\",\"Jam\":\"\",\"Keterangan\":\"Hari Minggu tidak ada dokter. Perawatan oleh dokter (peeling, microneedling, laser) dan konsultasi dokter hanya di hari dokter praktik\",\"Keahlian\":\"\"}\n];\nreturn baris.map(json => ({ json }));"
+      }
+    },
+    {
+      "id": "0b296e32-2bb2-4380-861c-953d6626edcc",
+      "name": "Tulis Jadwal",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1320,
+        0
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "append",
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "YOUR_CLINIC_DATA_SHEET_ID"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Jadwal"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "schema": []
+        },
+        "options": {
+          "cellFormat": "RAW",
+          "handlingExtraData": "insertInNewColumn"
+        }
+      }
+    },
+    {
+      "id": "25a4aa3c-ae54-47db-a11a-fbe6d361d136",
+      "name": "Kosongkan Promo",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1540,
+        0
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "clear",
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "YOUR_CLINIC_DATA_SHEET_ID"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Promo"
+        },
+        "clear": "wholeSheet",
+        "keepFirstRow": true
+      },
+      "executeOnce": true
+    },
+    {
+      "id": "1ea3f45b-500a-41fd-b2ce-026fb43f4339",
+      "name": "Data Promo",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        0
+      ],
+      "parameters": {
+        "jsCode": "// Isi tab Promo di sheet Data Klinik (data contoh Klinik Aura Derma).\nconst baris = [\n  {\"Promo\":\"Facial Brightening untuk pasien baru\",\"Harga Promo\":225000,\"Berlaku Sampai\":\"30 November 2027\",\"Syarat\":\"Khusus kunjungan pertama\"},\n  {\"Promo\":\"Paket Facial Acne 3 kali\",\"Harga Promo\":650000,\"Berlaku Sampai\":\"30 November 2027\",\"Syarat\":\"Dipakai dalam 2 bulan, untuk satu orang\"},\n  {\"Promo\":\"Paket Chemical Peeling 3 kali\",\"Harga Promo\":1200000,\"Berlaku Sampai\":\"30 November 2027\",\"Syarat\":\"Termasuk konsultasi dokter, dipakai dalam 3 bulan, untuk satu orang\"},\n  {\"Promo\":\"Paket Laser Hair Removal Ketiak 6 kali\",\"Harga Promo\":2400000,\"Berlaku Sampai\":\"30 November 2027\",\"Syarat\":\"Dipakai dalam 1 tahun, untuk satu orang\"},\n  {\"Promo\":\"Gratis Facial Wash Aura Gentle\",\"Harga Promo\":\"\",\"Berlaku Sampai\":\"30 November 2027\",\"Syarat\":\"Setiap pembelian 2 produk skincare Aura, selama persediaan ada\"}\n];\nreturn baris.map(json => ({ json }));"
+      }
+    },
+    {
+      "id": "27624a15-4cc1-4baa-986b-63ff1743c655",
+      "name": "Tulis Promo",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1980,
+        0
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "append",
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "YOUR_CLINIC_DATA_SHEET_ID"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Promo"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "schema": []
+        },
+        "options": {
+          "cellFormat": "RAW",
+          "handlingExtraData": "insertInNewColumn"
+        }
+      }
+    },
+    {
+      "id": "b33810b8-0d24-4c4c-a5c3-368a08cb946a",
+      "name": "Kosongkan Info",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2200,
+        0
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "clear",
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "YOUR_CLINIC_DATA_SHEET_ID"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Info"
+        },
+        "clear": "wholeSheet",
+        "keepFirstRow": true
+      },
+      "executeOnce": true
+    },
+    {
+      "id": "78113cf1-bdee-416a-ac0c-f2c9d010252b",
+      "name": "Data Info",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2420,
+        0
+      ],
+      "parameters": {
+        "jsCode": "// Isi tab Info di sheet Data Klinik (data contoh Klinik Aura Derma).\nconst baris = [\n  {\"Topik\":\"Alamat\",\"Isi\":\"Jl. Contoh Raya No. 12, Bekasi (seberang minimarket, ruko cat putih)\"},\n  {\"Topik\":\"Jam buka\",\"Isi\":\"Setiap hari 09.00 sampai 20.00 WIB\"},\n  {\"Topik\":\"Cara booking\",\"Isi\":\"Lewat chat ini: sebutkan nama, perawatan, serta hari dan jam yang diinginkan. Admin yang mengonfirmasi jadwalnya.\"},\n  {\"Topik\":\"DP booking\",\"Isi\":\"Perawatan oleh dokter (peeling, microneedling, laser) perlu DP Rp100.000 yang nanti dipotong dari biaya perawatan. Facial dan konsultasi tidak perlu DP.\"},\n  {\"Topik\":\"Ganti jadwal atau batal\",\"Isi\":\"Bisa ganti jadwal paling lambat 1 hari sebelumnya lewat chat ini, DP tidak hangus. Kalau batal kurang dari 1 hari sebelumnya, DP tidak bisa dikembalikan.\"},\n  {\"Topik\":\"Terlambat datang\",\"Isi\":\"Toleransi terlambat 15 menit. Lebih dari itu, jadwal bisa digeser ke jam berikutnya yang masih kosong.\"},\n  {\"Topik\":\"Datang tanpa booking\",\"Isi\":\"Boleh untuk facial, dilayani kalau terapis sedang kosong. Perawatan oleh dokter sebaiknya booking dulu.\"},\n  {\"Topik\":\"Pembayaran\",\"Isi\":\"Tunai, transfer bank, QRIS, dan kartu debit. Belum menerima cicilan.\"},\n  {\"Topik\":\"Parkir\",\"Isi\":\"Tersedia untuk mobil dan motor di depan klinik\"},\n  {\"Topik\":\"Fasilitas\",\"Isi\":\"Ruang tunggu ber-AC, toilet, musala kecil, dan Wi-Fi gratis\"},\n  {\"Topik\":\"Datang dengan makeup\",\"Isi\":\"Sebaiknya datang tanpa makeup. Kalau memakai makeup, terapis akan membersihkannya dulu sebelum perawatan.\"},\n  {\"Topik\":\"Usia pasien\",\"Isi\":\"Pasien di bawah 17 tahun perlu didampingi orang tua atau wali.\"},\n  {\"Topik\":\"Hamil atau menyusui\",\"Isi\":\"Beberapa perawatan tidak boleh untuk ibu hamil atau menyusui, jadi pertanyaan ini dijawab langsung oleh tim klinik.\"},\n  {\"Topik\":\"Hasil perawatan\",\"Isi\":\"Hasil berbeda pada setiap orang dan biasanya terlihat setelah beberapa kali perawatan. Klinik tidak menjanjikan hasil tertentu.\"},\n  {\"Topik\":\"Kartu member\",\"Isi\":\"Setiap kunjungan perawatan dapat 1 cap. Setelah 10 cap, dapat 1 kali Facial Basic gratis.\"}\n];\nreturn baris.map(json => ({ json }));"
+      }
+    },
+    {
+      "id": "74420a69-b791-42fd-b116-d6848a26690a",
+      "name": "Tulis Info",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2640,
+        0
+      ],
+      "parameters": {
+        "resource": "sheet",
+        "operation": "append",
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "YOUR_CLINIC_DATA_SHEET_ID"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Info"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "schema": []
+        },
+        "options": {
+          "cellFormat": "RAW",
+          "handlingExtraData": "insertInNewColumn"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Jalankan": {
+      "main": [
+        [
+          {
+            "node": "Kosongkan Harga",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Kosongkan Harga": {
+      "main": [
+        [
+          {
+            "node": "Data Harga",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data Harga": {
+      "main": [
+        [
+          {
+            "node": "Tulis Harga",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tulis Harga": {
+      "main": [
+        [
+          {
+            "node": "Kosongkan Jadwal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Kosongkan Jadwal": {
+      "main": [
+        [
+          {
+            "node": "Data Jadwal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data Jadwal": {
+      "main": [
+        [
+          {
+            "node": "Tulis Jadwal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tulis Jadwal": {
+      "main": [
+        [
+          {
+            "node": "Kosongkan Promo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Kosongkan Promo": {
+      "main": [
+        [
+          {
+            "node": "Data Promo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data Promo": {
+      "main": [
+        [
+          {
+            "node": "Tulis Promo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tulis Promo": {
+      "main": [
+        [
+          {
+            "node": "Kosongkan Info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Kosongkan Info": {
+      "main": [
+        [
+          {
+            "node": "Data Info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data Info": {
+      "main": [
+        [
+          {
+            "node": "Tulis Info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": []
+}

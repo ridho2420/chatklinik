@@ -1,0 +1,259 @@
+{
+  "name": "Utilitas - Buat Sheet Prospek & Booking",
+  "nodes": [
+    {
+      "id": "d4670126-b88a-41ae-9163-fb9fd732d42d",
+      "name": "Jalankan",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        304
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "c4182338-e351-4c8e-b399-377014e2fde7",
+      "name": "Pengaturan",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        304
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "judul",
+              "name": "judul_file",
+              "value": "Prospek & Booking - Klinik Aura Derma",
+              "type": "string"
+            },
+            {
+              "id": "robot",
+              "name": "email_robot",
+              "value": "YOUR_SERVICE_ACCOUNT_EMAIL",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "d9f34815-5c7a-430a-8b45-c6c03a010cec",
+      "name": "Susun Permintaan",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        304
+      ],
+      "parameters": {
+        "jsCode": "// Menyusun isi permintaan ke Google: membuat spreadsheet, lalu merapikan tampilannya.\nconst cfg = $('Pengaturan').first().json;\n\nfunction warna(hex) {\n  return {\n    red: parseInt(hex.slice(1, 3), 16) / 255,\n    green: parseInt(hex.slice(3, 5), 16) / 255,\n    blue: parseInt(hex.slice(5, 7), 16) / 255,\n  };\n}\n\nconst kolom = [\n  'Nomor WA', 'Nama', 'Perawatan', 'Waktu Diminta', 'Status',\n  'Pertama Chat', 'Terakhir Chat', 'Diteruskan Pada', 'Pesan Terakhir',\n  'Label', 'Catatan Admin',\n];\nconst lebar = [140, 140, 170, 160, 180, 130, 130, 140, 300, 140, 240];\nconst status = ['Tanya-tanya', 'Menunggu Konfirmasi', 'Terkonfirmasi', 'Batal'];\nconst BARIS = 1000;\n\nconst petunjuk = [\n  'PROSPEK & BOOKING (diisi otomatis oleh bot)',\n  '',\n  'Kolom Nomor WA sampai Pesan Terakhir diisi bot. Jangan mengubah judul kolom dan nama tab.',\n  '',\n  'Arti status:',\n  '- Tanya-tanya: calon pasien baru bertanya, belum minta jadwal. (otomatis)',\n  '- Menunggu Konfirmasi: bot sudah meneruskan permintaan booking ke admin. (otomatis)',\n  '- Terkonfirmasi: nomor pasien sudah tercatat di sheet Booking. (otomatis, dicek tiap malam)',\n  '- Batal: diisi ADMIN kalau pasien batal.',\n  '',\n  'Bot tidak akan menimpa status Batal atau Terkonfirmasi.',\n  'Kalau pasien yang Batal mengajukan booking baru, statusnya kembali menjadi Menunggu Konfirmasi.',\n  '',\n  'Baris merah dan label \"Lewat 24 jam\": permintaan booking yang belum dikonfirmasi lebih dari 24 jam.',\n  'Cek ke pasien, lalu catat booking-nya di sheet Booking, atau ubah status menjadi Batal.',\n  '',\n  'Kolom Catatan Admin bebas diisi dan tidak disentuh bot.',\n];\n\nconst buat = {\n  properties: {\n    title: cfg.judul_file,\n    locale: 'en_US',\n    timeZone: 'Asia/Jakarta',\n    autoRecalc: 'HOUR',\n  },\n  sheets: [\n    {\n      properties: {\n        sheetId: 0,\n        title: 'Prospek',\n        gridProperties: { rowCount: BARIS, columnCount: kolom.length, frozenRowCount: 1 },\n      },\n      data: [{\n        startRow: 0,\n        startColumn: 0,\n        rowData: [{\n          values: kolom.map(k => ({\n            userEnteredValue: { stringValue: k },\n            userEnteredFormat: {\n              backgroundColor: warna('#1F4E78'),\n              textFormat: { bold: true, foregroundColor: warna('#FFFFFF') },\n              verticalAlignment: 'MIDDLE',\n            },\n          })),\n        }],\n      }],\n    },\n    {\n      properties: {\n        sheetId: 1,\n        title: 'Petunjuk',\n        gridProperties: { rowCount: petunjuk.length + 5, columnCount: 1 },\n      },\n      data: [{\n        startRow: 0,\n        startColumn: 0,\n        rowData: petunjuk.map((t, i) => ({\n          values: [{\n            userEnteredValue: { stringValue: t },\n            userEnteredFormat: i === 0 ? { textFormat: { bold: true, fontSize: 12 } } : {},\n          }],\n        })),\n      }],\n    },\n  ],\n};\n\nfunction rentang(kolAwal, kolAkhir) {\n  return { sheetId: 0, startRowIndex: 1, endRowIndex: BARIS, startColumnIndex: kolAwal, endColumnIndex: kolAkhir };\n}\nconst semuaBaris = rentang(0, kolom.length);\nconst kolStatus = rentang(4, 5);\n\nconst requests = [\n  // Dropdown status\n  { setDataValidation: {\n      range: kolStatus,\n      rule: {\n        condition: { type: 'ONE_OF_LIST', values: status.map(s => ({ userEnteredValue: s })) },\n        strict: true,\n        showCustomUi: true,\n      },\n  } },\n  // Nomor WA disimpan sebagai teks supaya tidak berubah jadi angka 6,28E+12\n  { repeatCell: {\n      range: rentang(0, 1),\n      cell: { userEnteredFormat: { numberFormat: { type: 'TEXT' } } },\n      fields: 'userEnteredFormat.numberFormat',\n  } },\n  // Kolom tanggal dan jam\n  { repeatCell: {\n      range: rentang(5, 8),\n      cell: { userEnteredFormat: { numberFormat: { type: 'DATE_TIME', pattern: 'dd/mm/yyyy hh:mm' } } },\n      fields: 'userEnteredFormat.numberFormat',\n  } },\n  // Pesan terakhir dan catatan admin dibungkus supaya tidak memanjang\n  { repeatCell: {\n      range: rentang(8, 9),\n      cell: { userEnteredFormat: { wrapStrategy: 'WRAP' } },\n      fields: 'userEnteredFormat.wrapStrategy',\n  } },\n  { repeatCell: {\n      range: rentang(10, 11),\n      cell: { userEnteredFormat: { wrapStrategy: 'WRAP' } },\n      fields: 'userEnteredFormat.wrapStrategy',\n  } },\n  // Baris merah: menunggu konfirmasi lebih dari 24 jam\n  { addConditionalFormatRule: {\n      index: 0,\n      rule: {\n        ranges: [semuaBaris],\n        booleanRule: {\n          condition: { type: 'CUSTOM_FORMULA', values: [{ userEnteredValue: '=AND($E2=\"Menunggu Konfirmasi\",$H2<>\"\",NOW()-$H2>1)' }] },\n          format: { backgroundColor: warna('#F8D7DA') },\n        },\n      },\n  } },\n  // Status Terkonfirmasi berwarna hijau\n  { addConditionalFormatRule: {\n      index: 1,\n      rule: {\n        ranges: [kolStatus],\n        booleanRule: {\n          condition: { type: 'TEXT_EQ', values: [{ userEnteredValue: 'Terkonfirmasi' }] },\n          format: { backgroundColor: warna('#D4EDDA') },\n        },\n      },\n  } },\n  // Baris Batal berwarna abu-abu\n  { addConditionalFormatRule: {\n      index: 2,\n      rule: {\n        ranges: [semuaBaris],\n        booleanRule: {\n          condition: { type: 'CUSTOM_FORMULA', values: [{ userEnteredValue: '=$E2=\"Batal\"' }] },\n          format: { textFormat: { foregroundColor: warna('#9E9E9E') } },\n        },\n      },\n  } },\n  // Lebar kolom\n  ...lebar.map((px, i) => ({ updateDimensionProperties: {\n      range: { sheetId: 0, dimension: 'COLUMNS', startIndex: i, endIndex: i + 1 },\n      properties: { pixelSize: px },\n      fields: 'pixelSize',\n  } })),\n  { updateDimensionProperties: {\n      range: { sheetId: 1, dimension: 'COLUMNS', startIndex: 0, endIndex: 1 },\n      properties: { pixelSize: 760 },\n      fields: 'pixelSize',\n  } },\n];\n\nreturn [{ json: { buat, rapikan: { requests }, email_robot: String(cfg.email_robot || '').trim() } }];\n"
+      }
+    },
+    {
+      "id": "493c6f90-3632-4709-9cf0-af575c6d9cd7",
+      "name": "Buat Spreadsheet",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        672,
+        304
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://sheets.googleapis.com/v4/spreadsheets",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleSheetsOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.buat) }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "fd8337c5-79b8-4bf6-8aa7-9b33e461909f",
+      "name": "Rapikan Tampilan",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        880,
+        304
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "=https://sheets.googleapis.com/v4/spreadsheets/{{ $json.spreadsheetId }}:batchUpdate",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleSheetsOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($('Susun Permintaan').first().json.rapikan) }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "9f2535c3-3f0e-4281-a0d9-64bd3f17d060",
+      "name": "Bagikan ke Robot",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1104,
+        304
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "=https://www.googleapis.com/drive/v3/files/{{ $('Buat Spreadsheet').first().json.spreadsheetId }}/permissions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleSheetsOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "sendNotificationEmail",
+              "value": "false"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ role: 'writer', type: 'user', emailAddress: $('Susun Permintaan').first().json.email_robot }) }}",
+        "options": {}
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "c13c442f-1e8a-4a03-935c-d83e78808d3e",
+      "name": "Hasil",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1328,
+        304
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "sid",
+              "name": "id_spreadsheet",
+              "value": "={{ $('Buat Spreadsheet').first().json.spreadsheetId }}",
+              "type": "string"
+            },
+            {
+              "id": "url",
+              "name": "alamat",
+              "value": "={{ $('Buat Spreadsheet').first().json.spreadsheetUrl }}",
+              "type": "string"
+            },
+            {
+              "id": "bagi",
+              "name": "dibagikan_ke_robot",
+              "value": "={{ !$json.error && !!$json.id }}",
+              "type": "boolean"
+            },
+            {
+              "id": "err",
+              "name": "catatan_bagikan",
+              "value": "={{ $json.error ? JSON.stringify($json.error) : '' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "a8278f06-910d-4996-90ac-4a929b98abbe",
+      "name": "Sticky Note a13d702d",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "content": "## Utilitas: buat sheet Prospek & Booking\nJalankan manual (Execute workflow). Membuat spreadsheet baru di Drive pemilik credential Google Sheets account, lengkap dengan dropdown status, format tanggal, dan baris merah untuk booking yang menggantung lebih dari 24 jam, lalu membagikannya ke akun robot sebagai Editor.\n\nUntuk klinik lain: ubah judul_file dan email_robot di node Pengaturan, lalu jalankan lagi.",
+        "height": 220,
+        "width": 560,
+        "color": 4
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Jalankan": {
+      "main": [
+        [
+          {
+            "node": "Pengaturan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pengaturan": {
+      "main": [
+        [
+          {
+            "node": "Susun Permintaan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Susun Permintaan": {
+      "main": [
+        [
+          {
+            "node": "Buat Spreadsheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buat Spreadsheet": {
+      "main": [
+        [
+          {
+            "node": "Rapikan Tampilan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rapikan Tampilan": {
+      "main": [
+        [
+          {
+            "node": "Bagikan ke Robot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bagikan ke Robot": {
+      "main": [
+        [
+          {
+            "node": "Hasil",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": []
+}

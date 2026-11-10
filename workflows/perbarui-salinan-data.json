@@ -1,0 +1,348 @@
+{
+  "name": "Klinik - Perbarui Salinan Data",
+  "nodes": [
+    {
+      "id": "41e84911-7509-4952-a7e1-9e660edc7874",
+      "name": "Perbarui Sekarang",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "25e712e5-8d3b-4b25-bc30-ebe89fcb8dac",
+      "name": "Pengaturan Salinan",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        100
+      ],
+      "parameters": {
+        "mode": "manual",
+        "includeOtherFields": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f1a2b3c4-salinan-0001",
+              "name": "id_sheet_data_klinik",
+              "value": "YOUR_CLINIC_DATA_SHEET_ID",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "b9804a4f-c66a-478b-afa4-ae07bd43ad1e",
+      "name": "Salin Harga",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        480,
+        100
+      ],
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Pengaturan Salinan').first().json.id_sheet_data_klinik }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Harga"
+        },
+        "options": {}
+      },
+      "executeOnce": true,
+      "alwaysOutputData": true
+    },
+    {
+      "id": "df0c791c-25eb-474d-b78b-73dd0f751b92",
+      "name": "Salin Jadwal",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        700,
+        100
+      ],
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Pengaturan Salinan').first().json.id_sheet_data_klinik }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Jadwal"
+        },
+        "options": {}
+      },
+      "executeOnce": true,
+      "alwaysOutputData": true
+    },
+    {
+      "id": "afd7458b-99bb-4dc4-a490-efaae2f49c76",
+      "name": "Salin Promo",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        920,
+        100
+      ],
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Pengaturan Salinan').first().json.id_sheet_data_klinik }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Promo"
+        },
+        "options": {}
+      },
+      "executeOnce": true,
+      "alwaysOutputData": true
+    },
+    {
+      "id": "866bf790-840c-4e18-8816-404906beaaf7",
+      "name": "Salin Info",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1140,
+        100
+      ],
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Pengaturan Salinan').first().json.id_sheet_data_klinik }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Info"
+        },
+        "options": {}
+      },
+      "executeOnce": true,
+      "alwaysOutputData": true
+    },
+    {
+      "id": "806d3123-9311-434f-a7e1-4dde515e7780",
+      "name": "Susun Salinan",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1360,
+        100
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Mengubah isi 4 tab Data Klinik menjadi 4 baris salinan (satu baris per tab) untuk data table \"Salinan Data Klinik\".\n// Bot Balas Chat membaca salinan ini, jadi tidak perlu membuka Google Sheets setiap ada chat.\nconst waktu = new Date().toISOString();\nconst ambil = n => $(n).all().map(i => i.json).filter(r => r && Object.keys(r).length > 0);\n// Kalau tab Harga terbaca kosong, kemungkinan ada gangguan: salinan lama dipertahankan.\nif (!ambil('Salin Harga').length) throw new Error('Tab Harga terbaca kosong, salinan lama dipertahankan');\nreturn [\n  ['harga', 'Salin Harga'], ['jadwal', 'Salin Jadwal'], ['promo', 'Salin Promo'], ['info', 'Salin Info'],\n].map(([tab, n]) => ({ json: { tab, isi: JSON.stringify(ambil(n)), diperbarui: waktu } }));"
+      },
+      "executeOnce": true
+    },
+    {
+      "id": "215e91fe-6666-4df5-b6a7-20aa403b13b7",
+      "name": "Simpan Salinan",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1580,
+        100
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "upsert",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "YOUR_CLINIC_DATA_COPY_TABLE_ID",
+          "cachedResultName": "Salinan Data Klinik"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "tab",
+              "condition": "eq",
+              "keyValue": "={{ $json.tab }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "tab": "={{ $json.tab }}",
+            "isi": "={{ $json.isi }}",
+            "diperbarui": "={{ $json.diperbarui }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "tab",
+              "displayName": "tab",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "isi",
+              "displayName": "isi",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "diperbarui",
+              "displayName": "diperbarui",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "84f6b37d-4879-4e4c-8d36-3d1146fc2c8f",
+      "name": "Tiap 30 Menit",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        200
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 30
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Perbarui Sekarang": {
+      "main": [
+        [
+          {
+            "node": "Pengaturan Salinan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pengaturan Salinan": {
+      "main": [
+        [
+          {
+            "node": "Salin Harga",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Salin Harga": {
+      "main": [
+        [
+          {
+            "node": "Salin Jadwal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Salin Jadwal": {
+      "main": [
+        [
+          {
+            "node": "Salin Promo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Salin Promo": {
+      "main": [
+        [
+          {
+            "node": "Salin Info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Salin Info": {
+      "main": [
+        [
+          {
+            "node": "Susun Salinan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Susun Salinan": {
+      "main": [
+        [
+          {
+            "node": "Simpan Salinan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tiap 30 Menit": {
+      "main": [
+        [
+          {
+            "node": "Pengaturan Salinan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": []
+}
